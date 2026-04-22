@@ -25,14 +25,18 @@ async def analizar_sentimiento(request: TextAnalysisRequest):
 @app.post("/analisis/metricas", response_model=MetricasResponse)
 async def analizar_metricas():
     if dataframe_principal is None:
-        raise HTTPException(status_code=500, detail="El dataset no está disponible.")
-    
-    # Ejemplo de lógica que puedes ir armando con tu equipo:
-    # top_users = dataframe_principal.groupby('user_id')['likes'].sum().nlargest(5).index.tolist()
-    
+        raise HTTPException(status_code=500, detail="Dataset no disponible")
+
+    # 1. Calcular total de likes de toda la red
+    total_likes_red = int(dataframe_principal['likes'].sum())
+
+    # 2. Encontrar top 5 influencers (usuarios con más likes sumados)
+    influencers = dataframe_principal.groupby('user_id')['likes'].sum().nlargest(5)
+    top_nombres = influencers.index.tolist()
+
     return {
-        "total_likes": 5000, # Reemplazar con lógica real
-        "top_influencers": ["usuario_1", "usuario_2"] # Reemplazar con lógica real
+        "total_likes": total_likes_red,
+        "top_influencers": top_nombres
     }
 
 # 3. Endpoint de Propagación OBLIGATORIO (Rol 3 inyectará su algoritmo aquí)
