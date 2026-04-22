@@ -5,6 +5,11 @@ from typing import List, Optional
 class TextAnalysisRequest(BaseModel):
     text: str
 
+class ResumenRequest(BaseModel):
+    textos: List[str]
+    max_palabras: int = 120
+    idioma: str = "es"
+
 class PropagationRequest(BaseModel):
     post_id: str
 
@@ -13,6 +18,12 @@ class SentimientoResponse(BaseModel):
     clima: str
     score: float
     justificacion: str
+
+class ResumenResponse(BaseModel):
+    resumen: str
+    temas_principales: List[str]
+    posturas_clave: List[str]
+    alcance_textos: int
 
 class MetricasResponse(BaseModel):
     total_likes: int
@@ -28,4 +39,4 @@ class PropagacionResponse(BaseModel):
     velocidad_media_label: str
     porcentaje_contenido_replicado: float
     score_impacto: float
-    nivel_impacto: str
+    nivel_impacto: str
