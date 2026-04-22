@@ -1,15 +1,19 @@
 from fastapi import FastAPI, HTTPException
 from schemas import (
-    TextAnalysisRequest, PropagationRequest, 
-    SentimientoResponse, MetricasResponse, PropagacionResponse
+    TextAnalysisRequest, 
+    SentimientoResponse, MetricasResponse
 )
 from data_loader import dataframe_principal
+from routers.propagacion_endpoint import router as propagacion_router
 
 app = FastAPI(
     title="API Analítica - Reto MCP",
     description="Microservicios para el análisis de conversaciones digitales.",
     version="1.0.0"
 )
+
+# Incluir Routers Modulares
+app.include_router(propagacion_router)
 
 # 1. Endpoint de Sentimientos (Rol 2 inyectará la lógica del LLM aquí)
 @app.post("/analisis/sentimientos", response_model=SentimientoResponse)
@@ -37,14 +41,4 @@ async def analizar_metricas():
     return {
         "total_likes": total_likes_red,
         "top_influencers": top_nombres
-    }
-
-# 3. Endpoint de Propagación OBLIGATORIO (Rol 3 inyectará su algoritmo aquí)
-@app.post("/analisis/propagacion", response_model=PropagacionResponse)
-async def medir_propagacion(request: PropagationRequest):
-    # DUMMY RESPONSE: Reemplazar con el algoritmo de grafos o recursión
-    return {
-        "id_original": request.post_id,
-        "alcance": 120,
-        "velocidad_media": "15 min"
-    }
+    }

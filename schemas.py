@@ -20,5 +20,12 @@ class MetricasResponse(BaseModel):
 
 class PropagacionResponse(BaseModel):
     id_original: str
+    encontrado: bool
     alcance: int
-    velocidad_media: str
+    replies_directas: int
+    cadena_total_nodos: int
+    velocidad_media_min: Optional[float]
+    velocidad_media_label: str
+    porcentaje_contenido_replicado: float
+    score_impacto: float
+    nivel_impacto: str
