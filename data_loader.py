@@ -23,16 +23,17 @@ def load_dataset() -> Optional[pd.DataFrame]:
         # --- Normalizar nombres de columnas (lowercase, sin espacios) ---
         df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
 
-        # --- Mapeo flexible de columnas comunes (Basado en requerimientos del equipo) ---
+        # --- Mapeo flexible de columnas comunes ---
+        # Incluye aliases del dataset real (Brandwatch/Talkwalker style: sin underscores)
         column_aliases = {
-            "post_id":     ["post_id", "id", "message_id", "msg_id", "tweet_id"],
-            "parent_id":   ["parent_id", "reply_to", "in_reply_to", "parent", "thread_id"],
-            "user_id":     ["user_id", "author_id", "user", "author"],
-            "text":        ["text", "content", "message", "body", "tweet"],
-            "timestamp":   ["timestamp", "created_at", "date", "datetime", "time"],
-            "likes":       ["likes", "like_count", "favorites", "reactions"],
+            "post_id":     ["post_id", "id", "message_id", "msg_id", "tweet_id", "preciseid"],
+            "parent_id":   ["parent_id", "parentid", "reply_to", "in_reply_to", "parent"],
+            "user_id":     ["user_id", "authorid", "author_id", "user", "author"],
+            "text":        ["text", "content", "message", "body", "tweet", "description"],
+            "timestamp":   ["timestamp", "createdat", "created_at", "date", "datetime", "time"],
+            "likes":       ["likes", "influencescore", "like_count", "favorites", "reactions", "rating"],
             "shares":      ["shares", "retweets", "reshares", "share_count"],
-            "platform":    ["platform", "network", "source", "red"],
+            "platform":    ["platform", "socialtype", "network", "source", "red", "sourcename"],
         }
 
         rename_map = {}
@@ -46,10 +47,23 @@ def load_dataset() -> Optional[pd.DataFrame]:
 
         # --- Limpieza y Conversión de tipos ---
         if "timestamp" in df.columns:
-            df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True)
-        
+            # Soporta: ISO string, epoch segundos y epoch milisegundos
+            ts = pd.to_numeric(df["timestamp"], errors="coerce")
+            if ts.notna().any():
+                # Epoch en milisegundos (> 1e10) → convertir a segundos
+                ts = ts.where(ts < 1e10, ts / 1000)
+                df["timestamp"] = pd.to_datetime(ts, unit="s", utc=True, errors="coerce")
+                # Rellenar los que no son numéricos con parse de string
+                mask = df["timestamp"].isna()
+                if mask.any():
+                    df.loc[mask, "timestamp"] = pd.to_datetime(
+                        df.loc[mask, "timestamp"].astype(str), errors="coerce", utc=True
+                    )
+            else:
+                df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce", utc=True)
+
         if "likes" in df.columns:
-            df["likes"] = df["likes"].fillna(0).astype(int)
+            df["likes"] = pd.to_numeric(df["likes"], errors="coerce").fillna(0).astype(int)
             
         if "post_id" in df.columns:
             df["post_id"] = df["post_id"].astype(str).str.strip()
@@ -66,4 +80,4 @@ def load_dataset() -> Optional[pd.DataFrame]:
         return None
 
 # Variable global (Singleton)
-dataframe_principal = load_dataset()
+dataframe_principal = load_dataset()
