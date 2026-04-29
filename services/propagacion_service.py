@@ -60,9 +60,9 @@ def analizar_propagacion(post_id: str, df: pd.DataFrame) -> Dict[str, Any]:
     # 6. Cálculo del Score de Impacto (0-100)
     score = _calcular_score_impacto(
         alcance=alcance,
-        usuarios_unicos=usuarios_unicos,
-        matching_pct=matching["porcentaje_matching"],
-        velocidad_min=metricas_tiempo.get("velocidad_media_minutos"),
+        usuarios=usuarios_unicos,
+        matching=matching["porcentaje_matching"],
+        velocidad=metricas_tiempo.get("velocidad_media_minutos"),
         likes=likes_originales,
         shares=shares_originales,
     )
@@ -108,12 +108,11 @@ def _bfs_propagacion(post_id: str, df: pd.DataFrame) -> List[str]:
     if "parent_id" not in df.columns:
         return []
 
-    # Optimización: Mapa de parent_id -> lista de hijos
+    # Construcción del mapa parent→hijos con groupby (O(n) sin iterrows)
+    filtered = df[df["parent_id"].notna()][["parent_id", "post_id"]].copy()
     children_map: Dict[str, List[str]] = {}
-    for _, row in df[df["parent_id"].notna()].iterrows():
-        parent = str(row["parent_id"])
-        child  = str(row["post_id"])
-        children_map.setdefault(parent, []).append(child)
+    for parent, group in filtered.groupby("parent_id")["post_id"]:
+        children_map[str(parent)] = group.astype(str).tolist()
 
     visitados = set()
     cola = deque([str(post_id)])

@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from schemas import (
     TextAnalysisRequest,
     ResumenRequest,
@@ -16,10 +17,18 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# CORS: permite que Streamlit (puerto 8501) consuma la API (puerto 8000)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8501", "http://127.0.0.1:8501"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
 # Incluir Routers Modulares
 app.include_router(propagacion_router)
 
-# 1. Endpoint de Sentimientos (Rol 2 inyectará la lógica del LLM aquí)
+# 1. Endpoint de Sentimientos
 @app.post("/analisis/sentimientos", response_model=SentimientoResponse)
 async def analizar_sentimiento(request: TextAnalysisRequest):
     try:
@@ -27,7 +36,7 @@ async def analizar_sentimiento(request: TextAnalysisRequest):
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
-# 2. Endpoint de Resumen General (Rol 2 inyectará la logica del LLM aqui)
+# 2. Endpoint de Resumen General
 @app.post("/analisis/resumen", response_model=ResumenResponse)
 async def analizar_resumen(request: ResumenRequest):
     try:
@@ -39,20 +48,38 @@ async def analizar_resumen(request: ResumenRequest):
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
-# 3. Endpoint de Métricas (Lógica de Datos Tradicional)
+# 3. Endpoint de Métricas (enriquecido: total mensajes, plataformas, top posts)
 @app.post("/analisis/metricas", response_model=MetricasResponse)
 async def analizar_metricas():
     if dataframe_principal is None:
         raise HTTPException(status_code=500, detail="Dataset no disponible")
 
-    # 1. Calcular total de likes de toda la red
-    total_likes_red = int(dataframe_principal['likes'].sum())
+    df = dataframe_principal
 
-    # 2. Encontrar top 5 influencers (usuarios con más likes sumados)
-    influencers = dataframe_principal.groupby('user_id')['likes'].sum().nlargest(5)
-    top_nombres = influencers.index.tolist()
+    total_likes_red = int(df["likes"].sum())
+    total_mensajes = int(len(df))
+
+    influencers = df.groupby("user_id")["likes"].sum().nlargest(5)
+    top_influencers = influencers.index.tolist()
+
+    top_posts = (
+        df.nlargest(5, "likes")[["post_id", "likes", "text"]]
+        .assign(text=lambda d: d["text"].str[:100])
+        .to_dict(orient="records")
+        if "post_id" in df.columns and "text" in df.columns
+        else []
+    )
+
+    plataformas = (
+        df["platform"].dropna().unique().tolist()
+        if "platform" in df.columns
+        else []
+    )
 
     return {
         "total_likes": total_likes_red,
-        "top_influencers": top_nombres
+        "total_mensajes": total_mensajes,
+        "top_influencers": top_influencers,
+        "top_posts_por_likes": top_posts,
+        "plataformas": plataformas,
     }

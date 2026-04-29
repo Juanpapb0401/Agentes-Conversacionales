@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 # --- Modelos de Entrada (Lo que envía el Agente) ---
 class TextAnalysisRequest(BaseModel):
@@ -27,7 +27,10 @@ class ResumenResponse(BaseModel):
 
 class MetricasResponse(BaseModel):
     total_likes: int
+    total_mensajes: int
     top_influencers: List[str]
+    top_posts_por_likes: List[Dict[str, Any]]
+    plataformas: List[str]
 
 class PropagacionResponse(BaseModel):
     id_original: str
@@ -35,6 +38,8 @@ class PropagacionResponse(BaseModel):
     alcance: int
     replies_directas: int
     cadena_total_nodos: int
+    usuarios_unicos_en_cadena: Optional[int] = None
+    plataformas: Optional[List[str]] = None
     velocidad_media_min: Optional[float]
     velocidad_media_label: str
     porcentaje_contenido_replicado: float

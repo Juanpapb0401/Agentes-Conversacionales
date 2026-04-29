@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional
 load_dotenv()
 
 DEFAULT_OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-DEFAULT_GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-1.5-flash")
+DEFAULT_GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 DEFAULT_PROVIDER = os.environ.get("LLM_PROVIDER", "").strip().lower()
 
 MAX_PROMPT_CHARS = 12000
@@ -158,16 +158,21 @@ def _call_gemini(system_prompt: str, user_prompt: str, max_tokens: int = 300) ->
     model = DEFAULT_GEMINI_MODEL
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
 
+    # system_instruction separado del mensaje de usuario (API nativa de Gemini)
     payload = {
+        "system_instruction": {
+            "parts": [{"text": system_prompt}]
+        },
         "contents": [
             {
                 "role": "user",
-                "parts": [{"text": system_prompt + "\n\n" + user_prompt}]
+                "parts": [{"text": user_prompt}]
             }
         ],
         "generationConfig": {
             "temperature": 0.2,
-            "maxOutputTokens": max_tokens
+            "maxOutputTokens": max_tokens,
+            "responseMimeType": "application/json"
         }
     }
 
