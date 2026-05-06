@@ -89,6 +89,12 @@ Instrucciones de comportamiento:
 - Presenta los resultados de manera clara, estructurada y en lenguaje natural.
 - Si la pregunta está fuera de tu alcance, explícalo brevemente y sugiere qué análisis sí puedes realizar.
 - Nunca inventes datos; solo reporta lo que las herramientas devuelven.
+
+Manejo de errores de propagación:
+- Los post_id son hashes hexadecimales largos (ej: "c6adb4630994bdee807d387382d526bc"), NO números simples como "1001".
+- Si tool_analizar_propagacion devuelve un error 404, explica al usuario que ese ID no existe en el dataset
+  y sugiere que use tool_analizar_metricas primero para explorar la red, o que proporcione un ID real del dataset.
+- Nunca intentes adivinar o inventar un post_id válido.
 """)
 
 

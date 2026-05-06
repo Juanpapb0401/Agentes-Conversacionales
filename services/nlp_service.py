@@ -88,7 +88,7 @@ def resumir_conversacion_llm(
         "Responde solo JSON, sin markdown ni texto adicional."
     )
 
-    raw = _llm_call(system_prompt, user_prompt, max_tokens=400, session_id=session_id, service="resumen")
+    raw = _llm_call(system_prompt, user_prompt, max_tokens=1024, session_id=session_id, service="resumen")
     parsed = _safe_json_parse(raw)
 
     if not parsed:
@@ -188,6 +188,9 @@ def _call_gemini(system_prompt: str, user_prompt: str, max_tokens: int = 300, se
             "temperature": 0.2,
             "maxOutputTokens": max_tokens,
             "responseMimeType": "application/json"
+        },
+        "thinkingConfig": {
+            "thinkingBudget": 0
         }
     }
 

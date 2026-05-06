@@ -28,7 +28,7 @@ def load_dataset() -> Optional[pd.DataFrame]:
         column_aliases = {
             "post_id":     ["post_id", "id", "message_id", "msg_id", "tweet_id", "preciseid"],
             "parent_id":   ["parent_id", "parentid", "reply_to", "in_reply_to", "parent"],
-            "user_id":     ["user_id", "authorid", "author_id", "user", "author"],
+            "user_id":     ["user_id", "author", "author_id", "authorid", "user"],
             "text":        ["text", "content", "message", "body", "tweet", "description"],
             "timestamp":   ["timestamp", "createdat", "created_at", "date", "datetime", "time"],
             "likes":       ["likes", "influencescore", "like_count", "favorites", "reactions", "rating"],
