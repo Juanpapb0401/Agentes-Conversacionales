@@ -156,6 +156,24 @@ for turno in st.session_state.historial_ui:
         with st.chat_message("assistant", avatar="🔧"):
             with st.expander(f"🔧 Herramienta usada: `{turno['tool_name']}`", expanded=False):
                 st.json(turno["tool_output"])
+                
+                # --- Visualización Especial Rol 3 (Propagación) ---
+                if turno["tool_name"] == "tool_analizar_propagacion":
+                    try:
+                        data = turno["tool_output"]
+                        if isinstance(data, str):
+                            import json
+                            data = json.loads(data)
+                        
+                        if data.get("encontrado"):
+                            st.divider()
+                            st.subheader("🔍 Estructura Detectada")
+                            c1, c2 = st.columns(2)
+                            c1.metric("Arquetipo", data.get("arquetipo", "N/A"))
+                            c2.metric("Profundidad", f"{data.get('profundidad_maxima', 0)} niveles")
+                            st.info(f"**Score de Impacto:** {data.get('score_impacto', 0)}% — {data.get('nivel_impacto', 'N/A')}")
+                    except:
+                        pass
 
 # =============================================================================
 # Input del usuario
@@ -225,6 +243,22 @@ if pregunta:
             with st.chat_message("assistant", avatar="🔧"):
                 with st.expander(f"🔧 Herramienta usada: `{paso['tool_name']}`", expanded=False):
                     st.json(paso["tool_output"])
+                    
+                    # --- Visualización Especial Rol 3 (Propagación) ---
+                    if paso["tool_name"] == "tool_analizar_propagacion":
+                        try:
+                            import json
+                            data = json.loads(paso["tool_output"])
+                            if data.get("encontrado"):
+                                st.divider()
+                                st.subheader("🔍 Estructura Detectada")
+                                c1, c2 = st.columns(2)
+                                c1.metric("Arquetipo", data.get("arquetipo", "N/A"))
+                                c2.metric("Profundidad", f"{data.get('profundidad_maxima', 0)} niveles")
+                                st.info(f"**Score de Impacto:** {data.get('score_impacto', 0)}% — {data.get('nivel_impacto', 'N/A')}")
+                        except:
+                            pass
+
             st.session_state.historial_ui.append({
                 "rol": "tool_step",
                 "tool_name": paso["tool_name"],
@@ -283,3 +317,6 @@ if pregunta:
         with st.chat_message("assistant"):
             st.markdown(fallback_text)
         st.session_state.historial_ui.append({"rol": "assistant", "contenido": fallback_text})
+
+    # Forzar re-render para que el sidebar FinOps refleje los tokens de esta llamada
+    st.rerun()

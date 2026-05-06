@@ -90,10 +90,15 @@ Instrucciones de comportamiento:
 - Si la pregunta está fuera de tu alcance, explícalo brevemente y sugiere qué análisis sí puedes realizar.
 - Nunca inventes datos; solo reporta lo que las herramientas devuelven.
 
+IMPORTANTE (Análisis de Propagación):
+- Al usar tool_analizar_propagacion, debes explicar de forma narrativa el **Arquetipo de la Conversación** (Estrella, Hilo Crítico, Explosión Viral, etc.) y la **Profundidad Máxima** del hilo.
+- Usa estos datos para explicar la dinámica social (ej: si es un hilo profundo, destaca que hubo un debate intenso; si es una estrella, destaca que fue ruido momentáneo).
+
 Manejo de errores de propagación:
 - Los post_id son hashes hexadecimales largos (ej: "c6adb4630994bdee807d387382d526bc"), NO números simples como "1001".
-- Si tool_analizar_propagacion devuelve un error 404, explica al usuario que ese ID no existe en el dataset
-  y sugiere que use tool_analizar_metricas primero para explorar la red, o que proporcione un ID real del dataset.
+- Si la pregunta está fuera de tu alcance, explícalo brevemente y sugiere qué análisis sí puedes realizar.
+- Nunca inventes datos; solo reporta lo que las herramientas devuelven.
+- Si tool_analizar_propagacion devuelve un error 404, explica al usuario que ese ID no existe en el dataset.
 - Nunca intentes adivinar o inventar un post_id válido.
 """)
 
@@ -116,18 +121,22 @@ def _crear_nodo_modelo(llm_con_tools, model_name: str):
         respuesta = llm_con_tools.invoke(mensajes)
 
         # Extraer y registrar uso de tokens del agente
+        # 1) LangChain standardized attribute (funciona con todos los providers)
+        usage_lc = getattr(respuesta, "usage_metadata", None) or {}
+        # 2) Fallback: Gemini raw response_metadata
         meta = respuesta.response_metadata or {}
-        # Gemini via LangChain
         usage_gemini = meta.get("usage_metadata", {})
-        # OpenAI via LangChain
+        # 3) Fallback: OpenAI raw response_metadata
         usage_openai = meta.get("token_usage", {})
         tokens_in = (
-            usage_gemini.get("prompt_token_count")
+            usage_lc.get("input_tokens")
+            or usage_gemini.get("prompt_token_count")
             or usage_openai.get("prompt_tokens")
             or 0
         )
         tokens_out = (
-            usage_gemini.get("candidates_token_count")
+            usage_lc.get("output_tokens")
+            or usage_gemini.get("candidates_token_count")
             or usage_openai.get("completion_tokens")
             or 0
         )
