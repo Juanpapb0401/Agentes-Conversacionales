@@ -32,7 +32,7 @@ st.set_page_config(
 )
 
 st.title("🤖 Agente Conversacional")
-st.caption("Análisis de conversaciones digitales · Reto ICESI · Powered by Gemini 2.5 Flash + LangGraph")
+st.caption("Análisis de conversaciones digitales · Reto ICESI · Powered by Gemini 2.5 Flash Lite + LangGraph")
 
 # =============================================================================
 # Carga del grafo (una sola vez por sesión via st.cache_resource)
@@ -110,8 +110,8 @@ with st.sidebar:
     st.subheader("💡 Ejemplos de consultas")
     ejemplos = [
         "¿Quiénes son los usuarios más influyentes?",
-        "Analiza el sentimiento de este texto: 'Este producto es increíble, lo recomiendo a todos'",
-        "¿Qué tan viral fue el mensaje con ID 1001?",
+        "Analiza el sentimiento: 'El gobierno decepcionó a todos con esta decisión'",
+        "¿Qué tan viral fue el mensaje con ID 199219160505_1274366331365120?",
         "Resume esta conversación: ['El gobierno anunció nuevas medidas', 'La gente está molesta', 'Habrá protestas mañana']",
     ]
     for ejemplo in ejemplos:
@@ -222,7 +222,7 @@ if pregunta:
             })
 
     # Mostrar la respuesta final del agente
-    if respuesta_final:
+    if respuesta_final is not None and respuesta_final.strip():
         with st.chat_message("assistant"):
             st.markdown(respuesta_final)
         st.session_state.historial_ui.append({
@@ -230,7 +230,13 @@ if pregunta:
             "contenido": respuesta_final,
         })
     else:
-        fallback = "No obtuve una respuesta. Intenta reformular tu consulta."
+        # Intentar re-leer si el modelo retornó contenido vacío tras tool call
+        ai_msgs = [m for m in mensajes_respuesta if isinstance(m, AIMessage)]
+        contenido_recuperado = next(
+            (m.content for m in reversed(ai_msgs) if m.content and m.content.strip()),
+            None,
+        )
+        fallback_text = contenido_recuperado or "No obtuve una respuesta. Intenta reformular tu consulta."
         with st.chat_message("assistant"):
-            st.markdown(fallback)
-        st.session_state.historial_ui.append({"rol": "assistant", "contenido": fallback})
+            st.markdown(fallback_text)
+        st.session_state.historial_ui.append({"rol": "assistant", "contenido": fallback_text})
