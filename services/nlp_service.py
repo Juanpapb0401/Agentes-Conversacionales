@@ -187,10 +187,10 @@ def _call_gemini(system_prompt: str, user_prompt: str, max_tokens: int = 300, se
         "generationConfig": {
             "temperature": 0.2,
             "maxOutputTokens": max_tokens,
-            "responseMimeType": "application/json"
-        },
-        "thinkingConfig": {
-            "thinkingBudget": 0
+            "responseMimeType": "application/json",
+            "thinkingConfig": {
+                "thinkingBudget": 0
+            }
         }
     }
 
