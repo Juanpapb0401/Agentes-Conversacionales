@@ -6,6 +6,8 @@ import urllib.request
 from dotenv import load_dotenv
 from typing import Any, Dict, List, Optional
 
+from services.finops_service import log_call as _finops_log
+
 load_dotenv()
 
 DEFAULT_OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
@@ -15,7 +17,7 @@ DEFAULT_PROVIDER = os.environ.get("LLM_PROVIDER", "").strip().lower()
 MAX_PROMPT_CHARS = 12000
 
 
-def analizar_sentimiento_llm(texto: str, idioma: str = "es") -> Dict[str, Any]:
+def analizar_sentimiento_llm(texto: str, idioma: str = "es", session_id: str = "unknown") -> Dict[str, Any]:
     if not texto or not texto.strip():
         return {
             "clima": "neutral",
@@ -36,7 +38,7 @@ def analizar_sentimiento_llm(texto: str, idioma: str = "es") -> Dict[str, Any]:
         "Responde solo JSON, sin markdown ni texto adicional."
     )
 
-    raw = _llm_call(system_prompt, user_prompt, max_tokens=250)
+    raw = _llm_call(system_prompt, user_prompt, max_tokens=250, session_id=session_id, service="sentimiento")
     parsed = _safe_json_parse(raw)
 
     if not parsed:
@@ -56,7 +58,8 @@ def analizar_sentimiento_llm(texto: str, idioma: str = "es") -> Dict[str, Any]:
 def resumir_conversacion_llm(
     textos: List[str],
     max_palabras: int = 120,
-    idioma: str = "es"
+    idioma: str = "es",
+    session_id: str = "unknown",
 ) -> Dict[str, Any]:
     textos = [t for t in textos if t and t.strip()]
     if not textos:
@@ -85,7 +88,7 @@ def resumir_conversacion_llm(
         "Responde solo JSON, sin markdown ni texto adicional."
     )
 
-    raw = _llm_call(system_prompt, user_prompt, max_tokens=400)
+    raw = _llm_call(system_prompt, user_prompt, max_tokens=400, session_id=session_id, service="resumen")
     parsed = _safe_json_parse(raw)
 
     if not parsed:
@@ -104,17 +107,23 @@ def resumir_conversacion_llm(
     }
 
 
-def _llm_call(system_prompt: str, user_prompt: str, max_tokens: int = 300) -> str:
+def _llm_call(
+    system_prompt: str,
+    user_prompt: str,
+    max_tokens: int = 300,
+    session_id: str = "unknown",
+    service: str = "llm",
+) -> str:
     provider = DEFAULT_PROVIDER
     if provider == "openai":
-        return _call_openai(system_prompt, user_prompt, max_tokens=max_tokens)
+        return _call_openai(system_prompt, user_prompt, max_tokens=max_tokens, session_id=session_id, service=service)
     if provider == "gemini":
-        return _call_gemini(system_prompt, user_prompt, max_tokens=max_tokens)
+        return _call_gemini(system_prompt, user_prompt, max_tokens=max_tokens, session_id=session_id, service=service)
 
     raise RuntimeError("LLM_PROVIDER no esta configurado. Use 'openai' o 'gemini'.")
 
 
-def _call_openai(system_prompt: str, user_prompt: str, max_tokens: int = 300) -> str:
+def _call_openai(system_prompt: str, user_prompt: str, max_tokens: int = 300, session_id: str = "unknown", service: str = "llm") -> str:
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY no esta configurado")
@@ -144,13 +153,19 @@ def _call_openai(system_prompt: str, user_prompt: str, max_tokens: int = 300) ->
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read().decode("utf-8"))
+            usage = data.get("usage", {})
+            _finops_log(
+                session_id, service, DEFAULT_OPENAI_MODEL,
+                usage.get("prompt_tokens", 0),
+                usage.get("completion_tokens", 0),
+            )
             return data["choices"][0]["message"]["content"]
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8") if exc.fp else str(exc)
         raise RuntimeError(f"OpenAI HTTP {exc.code}: {detail}") from exc
 
 
-def _call_gemini(system_prompt: str, user_prompt: str, max_tokens: int = 300) -> str:
+def _call_gemini(system_prompt: str, user_prompt: str, max_tokens: int = 300, session_id: str = "unknown", service: str = "llm") -> str:
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY no esta configurado")
@@ -186,6 +201,12 @@ def _call_gemini(system_prompt: str, user_prompt: str, max_tokens: int = 300) ->
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read().decode("utf-8"))
+            usage = data.get("usageMetadata", {})
+            _finops_log(
+                session_id, service, model,
+                usage.get("promptTokenCount", 0),
+                usage.get("candidatesTokenCount", 0),
+            )
             candidates = data.get("candidates", [])
             if not candidates:
                 return "{}"

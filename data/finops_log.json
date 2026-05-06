@@ -1,0 +1,31 @@
+{
+  "sessions": {
+    "845f6dac-98b9-49fa-b6a2-42994f1d886f": {
+      "total_cost_usd": 0.0002295,
+      "total_tokens_in": 462,
+      "total_tokens_out": 267,
+      "calls": [
+        {
+          "timestamp": "2026-05-06T12:43:01.028394+00:00",
+          "service": "sentimiento",
+          "model": "gemini-2.5-flash",
+          "tokens_in": 312,
+          "tokens_out": 187,
+          "cost_usd": 0.000159
+        },
+        {
+          "timestamp": "2026-05-06T12:43:01.028893+00:00",
+          "service": "agente",
+          "model": "gemini-2.5-flash",
+          "tokens_in": 150,
+          "tokens_out": 80,
+          "cost_usd": 7.05e-05
+        }
+      ]
+    }
+  },
+  "global": {
+    "total_cost_usd": 0.0002295,
+    "total_calls": 2
+  }
+}

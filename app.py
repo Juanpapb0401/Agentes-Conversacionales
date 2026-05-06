@@ -9,12 +9,17 @@ Requiere que el servidor FastAPI esté activo:
     uvicorn main:app --reload
 """
 
+import os
 import uuid
 import streamlit as st
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
+from services.finops_service import SESSION_CTX, get_session_total, get_global_stats
+
 load_dotenv()
+
+SESSION_BUDGET = float(os.getenv("SESSION_BUDGET", "0.05"))
 
 # =============================================================================
 # Configuración de la página
@@ -76,6 +81,32 @@ with st.sidebar:
     )
 
     st.divider()
+
+    # FinOps Dashboard
+    st.subheader("💰 FinOps Dashboard")
+    fin_stats = get_session_total(st.session_state.thread_id)
+    pct = fin_stats["total_cost_usd"] / SESSION_BUDGET if SESSION_BUDGET > 0 else 0.0
+
+    st.progress(min(pct, 1.0))
+    st.caption(
+        f"Sesión: **${fin_stats['total_cost_usd']:.5f}** / ${SESSION_BUDGET:.2f} USD"
+    )
+    if pct >= 1.0:
+        st.error("⛔ Presupuesto agotado")
+    elif pct >= 0.8:
+        st.warning("⚠️ 80% del presupuesto consumido")
+
+    col1, col2 = st.columns(2)
+    col1.metric("Tokens entrada", f"{fin_stats['total_tokens_in']:,}")
+    col2.metric("Tokens salida", f"{fin_stats['total_tokens_out']:,}")
+    st.caption(f"Llamadas LLM esta sesión: **{fin_stats['calls_count']}**")
+
+    with st.expander("📊 Estadísticas globales"):
+        g = get_global_stats()
+        st.write(f"Costo total acumulado: **${g['total_cost_usd']:.5f}**")
+        st.write(f"Total llamadas históricas: **{g['total_calls']}**")
+
+    st.divider()
     st.subheader("💡 Ejemplos de consultas")
     ejemplos = [
         "¿Quiénes son los usuarios más influyentes?",
@@ -132,6 +163,20 @@ if pregunta:
 
     # Configuración del grafo (thread_id para memoria multi-turno)
     config = {"configurable": {"thread_id": st.session_state.thread_id}}
+
+    # FinOps: verificar presupuesto antes de invocar
+    stats_now = get_session_total(st.session_state.thread_id)
+    if stats_now["total_cost_usd"] >= SESSION_BUDGET:
+        with st.chat_message("assistant"):
+            st.error(
+                f"⛔ Presupuesto de sesión agotado "
+                f"(${stats_now['total_cost_usd']:.5f} / ${SESSION_BUDGET:.2f} USD). "
+                "Limpia la conversación para iniciar una nueva sesión."
+            )
+        st.stop()
+
+    # FinOps: propagar session_id al stack de llamadas (tools → FastAPI → nlp_service)
+    SESSION_CTX.set(st.session_state.thread_id)
 
     # Invocar el grafo con el mensaje del usuario
     with st.spinner("El agente está analizando..."):

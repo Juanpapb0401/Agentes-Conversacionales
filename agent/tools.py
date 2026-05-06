@@ -10,6 +10,8 @@ from typing import Any, Dict, List
 from langchain_core.tools import tool
 from dotenv import load_dotenv
 
+from services.finops_service import SESSION_CTX as _SESSION_CTX
+
 load_dotenv()
 
 # URL base de la API (configurable por variable de entorno)
@@ -19,12 +21,16 @@ _API_BASE_URL = os.environ.get("API_BASE_URL", "http://127.0.0.1:8000").rstrip("
 _HTTP_TIMEOUT = 30.0
 
 
+def _session_headers() -> Dict[str, str]:
+    return {"X-Session-ID": _SESSION_CTX.get()}
+
+
 def _get(endpoint: str, params: Dict[str, Any] | None = None) -> Dict[str, Any]:
     """Realiza una petición GET a la API y devuelve el JSON de respuesta."""
     url = f"{_API_BASE_URL}{endpoint}"
     try:
         with httpx.Client(timeout=_HTTP_TIMEOUT) as client:
-            response = client.get(url, params=params)
+            response = client.get(url, params=params, headers=_session_headers())
             response.raise_for_status()
             return response.json()
     except httpx.ConnectError:
@@ -43,7 +49,7 @@ def _post(endpoint: str, body: Dict[str, Any]) -> Dict[str, Any]:
     url = f"{_API_BASE_URL}{endpoint}"
     try:
         with httpx.Client(timeout=_HTTP_TIMEOUT) as client:
-            response = client.post(url, json=body)
+            response = client.post(url, json=body, headers=_session_headers())
             response.raise_for_status()
             return response.json()
     except httpx.ConnectError:

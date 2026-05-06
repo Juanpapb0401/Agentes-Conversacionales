@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from schemas import (
     TextAnalysisRequest,
@@ -30,20 +30,27 @@ app.include_router(propagacion_router)
 
 # 1. Endpoint de Sentimientos
 @app.post("/analisis/sentimientos", response_model=SentimientoResponse)
-async def analizar_sentimiento(request: TextAnalysisRequest):
+async def analizar_sentimiento(
+    request: TextAnalysisRequest,
+    session_id: str = Header(default="unknown", alias="X-Session-ID"),
+):
     try:
-        return analizar_sentimiento_llm(request.text)
+        return analizar_sentimiento_llm(request.text, session_id=session_id)
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 # 2. Endpoint de Resumen General
 @app.post("/analisis/resumen", response_model=ResumenResponse)
-async def analizar_resumen(request: ResumenRequest):
+async def analizar_resumen(
+    request: ResumenRequest,
+    session_id: str = Header(default="unknown", alias="X-Session-ID"),
+):
     try:
         return resumir_conversacion_llm(
             request.textos,
             max_palabras=request.max_palabras,
-            idioma=request.idioma
+            idioma=request.idioma,
+            session_id=session_id,
         )
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc

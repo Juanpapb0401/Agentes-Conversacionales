@@ -23,11 +23,13 @@ from typing import Literal
 
 from dotenv import load_dotenv
 from langchain_core.messages import SystemMessage
+from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.checkpoint.memory import MemorySaver
 
 from agent.tools import TOOLS
+from services.finops_service import log_call as _finops_log
 
 load_dotenv()
 
@@ -95,16 +97,37 @@ Instrucciones de comportamiento:
 # =============================================================================
 
 # Instanciar el LLM con las tools vinculadas (lazy: se hace al construir el grafo)
-def _crear_nodo_modelo(llm_con_tools):
+def _crear_nodo_modelo(llm_con_tools, model_name: str):
     """Fábrica del nodo llamar_modelo con el LLM ya inyectado."""
 
-    def llamar_modelo(state: MessagesState) -> dict:
+    def llamar_modelo(state: MessagesState, config: RunnableConfig) -> dict:
         """
         Nodo principal: invoca el LLM con el historial completo de mensajes.
         El sistema siempre encabeza la conversación para mantener el contexto del agente.
         """
+        thread_id = config.get("configurable", {}).get("thread_id", "unknown")
         mensajes = [SYSTEM_PROMPT] + state["messages"]
         respuesta = llm_con_tools.invoke(mensajes)
+
+        # Extraer y registrar uso de tokens del agente
+        meta = respuesta.response_metadata or {}
+        # Gemini via LangChain
+        usage_gemini = meta.get("usage_metadata", {})
+        # OpenAI via LangChain
+        usage_openai = meta.get("token_usage", {})
+        tokens_in = (
+            usage_gemini.get("prompt_token_count")
+            or usage_openai.get("prompt_tokens")
+            or 0
+        )
+        tokens_out = (
+            usage_gemini.get("candidates_token_count")
+            or usage_openai.get("completion_tokens")
+            or 0
+        )
+        if tokens_in or tokens_out:
+            _finops_log(thread_id, "agente", model_name, tokens_in, tokens_out)
+
         return {"messages": [respuesta]}
 
     return llamar_modelo
@@ -123,13 +146,14 @@ def construir_grafo():
     """
     # Instanciar LLM y vincular tools (tool-calling)
     llm = _build_llm()
+    model_name = getattr(llm, "model_name", None) or getattr(llm, "model", "unknown")
     llm_con_tools = llm.bind_tools(TOOLS)
 
     # Nodo de ejecución de herramientas (ToolNode maneja errores internamente)
     nodo_herramientas = ToolNode(tools=TOOLS)
 
     # Crear el nodo llamar_modelo con el LLM inyectado
-    nodo_modelo = _crear_nodo_modelo(llm_con_tools)
+    nodo_modelo = _crear_nodo_modelo(llm_con_tools, model_name)
 
     # Definir el grafo con MessagesState (lista de mensajes acumulada)
     builder = StateGraph(MessagesState)
