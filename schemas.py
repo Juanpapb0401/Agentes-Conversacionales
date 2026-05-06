@@ -35,6 +35,9 @@ class MetricasResponse(BaseModel):
 class PropagacionResponse(BaseModel):
     id_original: str
     encontrado: bool
+    texto_original: Optional[str] = None
+    timestamp_original: Optional[str] = None
+    autor_original: Optional[str] = None
     alcance: int
     replies_directas: int
     cadena_total_nodos: int
