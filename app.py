@@ -221,19 +221,26 @@ if pregunta:
                 "tool_output": paso["tool_output"],
             })
 
+    # Normalizar content a string (Gemini puede devolver lista de partes)
+    def _content_str(content) -> str:
+        if isinstance(content, list):
+            return " ".join(p.get("text", "") if isinstance(p, dict) else str(p) for p in content)
+        return str(content) if content is not None else ""
+
     # Mostrar la respuesta final del agente
-    if respuesta_final is not None and respuesta_final.strip():
+    texto_final = _content_str(respuesta_final)
+    if texto_final.strip():
         with st.chat_message("assistant"):
-            st.markdown(respuesta_final)
+            st.markdown(texto_final)
         st.session_state.historial_ui.append({
             "rol": "assistant",
-            "contenido": respuesta_final,
+            "contenido": texto_final,
         })
     else:
         # Intentar re-leer si el modelo retornó contenido vacío tras tool call
         ai_msgs = [m for m in mensajes_respuesta if isinstance(m, AIMessage)]
         contenido_recuperado = next(
-            (m.content for m in reversed(ai_msgs) if m.content and m.content.strip()),
+            (_content_str(m.content) for m in reversed(ai_msgs) if _content_str(m.content).strip()),
             None,
         )
         fallback_text = contenido_recuperado or "No obtuve una respuesta. Intenta reformular tu consulta."
