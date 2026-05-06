@@ -11,6 +11,7 @@ Requiere que el servidor FastAPI esté activo:
 
 import os
 import uuid
+import json
 import streamlit as st
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
@@ -142,6 +143,15 @@ for turno in st.session_state.historial_ui:
         with st.chat_message("assistant"):
             st.markdown(contenido)
 
+    elif rol == "mensaje_original":
+        with st.chat_message("assistant", avatar="📄"):
+            st.info(
+                f"**📌 Mensaje original** — `{turno['post_id']}`\n\n"
+                f"**Autor:** `{turno['autor']}`  \n"
+                f"**Fecha:** `{turno['timestamp']}`\n\n"
+                f"> {turno['texto']}"
+            )
+
     elif rol == "tool_step" and st.session_state.mostrar_pasos:
         with st.chat_message("assistant", avatar="🔧"):
             with st.expander(f"🔧 Herramienta usada: `{turno['tool_name']}`", expanded=False):
@@ -220,6 +230,32 @@ if pregunta:
                 "tool_name": paso["tool_name"],
                 "tool_output": paso["tool_output"],
             })
+
+    # Mostrar mensaje original si el agente analizó propagación
+    for paso in pasos_intermedios:
+        if paso["tool_name"] == "tool_analizar_propagacion":
+            output = paso["tool_output"]
+            if isinstance(output, str):
+                try:
+                    output = json.loads(output)
+                except Exception:
+                    pass
+            if isinstance(output, dict) and output.get("encontrado"):
+                turno_orig = {
+                    "rol": "mensaje_original",
+                    "post_id": output.get("id_original", ""),
+                    "autor": output.get("autor_original", "desconocido"),
+                    "timestamp": output.get("timestamp_original", "N/A"),
+                    "texto": output.get("texto_original", ""),
+                }
+                with st.chat_message("assistant", avatar="📄"):
+                    st.info(
+                        f"**📌 Mensaje original** — `{turno_orig['post_id']}`\n\n"
+                        f"**Autor:** `{turno_orig['autor']}`  \n"
+                        f"**Fecha:** `{turno_orig['timestamp']}`\n\n"
+                        f"> {turno_orig['texto']}"
+                    )
+                st.session_state.historial_ui.append(turno_orig)
 
     # Normalizar content a string (Gemini puede devolver lista de partes)
     def _content_str(content) -> str:
