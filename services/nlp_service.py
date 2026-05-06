@@ -11,7 +11,7 @@ from services.finops_service import log_call as _finops_log
 load_dotenv()
 
 DEFAULT_OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-DEFAULT_GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+DEFAULT_GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.0-flash")
 DEFAULT_PROVIDER = os.environ.get("LLM_PROVIDER", "").strip().lower()
 
 MAX_PROMPT_CHARS = 12000
