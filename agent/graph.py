@@ -61,7 +61,7 @@ def _build_llm():
             raise RuntimeError(
                 "Falta GEMINI_API_KEY en el archivo .env para usar el proveedor 'gemini'."
             )
-        model_name = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite")
+        model_name = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite-preview")
         return ChatGoogleGenerativeAI(model=model_name, google_api_key=api_key, temperature=0)
 
     raise RuntimeError(
