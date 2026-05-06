@@ -33,12 +33,13 @@ def analizar_propagacion(post_id: str, df: pd.DataFrame) -> Dict[str, Any]:
     post_original = df[post_mask].iloc[0]
 
     # 1. BFS para construir árbol de propagación (Nodos que responden al original o a sus descendientes)
-    nodos_propagacion = _bfs_propagacion(post_id, df)
+    nodos_propagacion, profundidad_max = _bfs_propagacion(post_id, df)
 
     # 2. Obtener respuestas directas (Hijos inmediatos en el árbol)
     replies_directas_df = df[
         (df.get("parent_id", pd.Series(dtype=str)) == str(post_id))
     ] if "parent_id" in df.columns else pd.DataFrame()
+    num_replies_directas = len(replies_directas_df)
 
     # 3. Métricas de tiempo (Velocidad de propagación)
     metricas_tiempo = _calcular_velocidad(post_original, replies_directas_df)
@@ -67,6 +68,9 @@ def analizar_propagacion(post_id: str, df: pd.DataFrame) -> Dict[str, Any]:
         shares=shares_originales,
     )
 
+    # 7. Nuevo Análisis de Arquetipo (Creatividad Rol 3)
+    arquetipo = _determinar_arquetipo(alcance, profundidad_max, num_replies_directas)
+
     return {
         "id_original": post_id,
         "encontrado": True,
@@ -76,8 +80,9 @@ def analizar_propagacion(post_id: str, df: pd.DataFrame) -> Dict[str, Any]:
 
         # Métricas de Alcance
         "alcance": alcance,
-        "replies_directas": len(replies_directas_df),
+        "replies_directas": num_replies_directas,
         "cadena_total_nodos": len(nodos_propagacion),
+        "profundidad_maxima": profundidad_max,
         "usuarios_unicos_en_cadena": usuarios_unicos,
         "plataformas": plataformas,
 
@@ -95,39 +100,44 @@ def analizar_propagacion(post_id: str, df: pd.DataFrame) -> Dict[str, Any]:
         "likes_originales": likes_originales,
         "shares_originales": shares_originales,
 
-        # Clasificación de Impacto
+        # Clasificación de Impacto (Creatividad Rol 3)
         "score_impacto": score,
         "nivel_impacto": _nivel_impacto(score),
+        "arquetipo": arquetipo,
     }
 
-def _bfs_propagacion(post_id: str, df: pd.DataFrame) -> List[str]:
+def _bfs_propagacion(post_id: str, df: pd.DataFrame) -> tuple[List[str], int]:
     """
     Realiza una búsqueda en anchura (BFS) para encontrar todos los descendientes en el grafo de conversaciones.
-    Detecta hilos de conversación anidados (comentarios de comentarios).
+    Detecta hilos de conversación anidados (comentarios de comentarios) y mide la profundidad máxima.
     """
     if "parent_id" not in df.columns:
-        return []
+        return [], 0
 
-    # Construcción del mapa parent→hijos con groupby (O(n) sin iterrows)
+    # Construcción del mapa parent→hijos con groupby
     filtered = df[df["parent_id"].notna()][["parent_id", "post_id"]].copy()
     children_map: Dict[str, List[str]] = {}
     for parent, group in filtered.groupby("parent_id")["post_id"]:
         children_map[str(parent)] = group.astype(str).tolist()
 
     visitados = set()
-    cola = deque([str(post_id)])
+    cola = deque([(str(post_id), 0)]) # (ID, nivel)
+    max_depth = 0
 
     while cola:
-        nodo_actual = cola.popleft()
-        if nodo_actual in visitados:
+        nodo_actual, nivel = cola.popleft()
+        if nodo_actual in visitados and nodo_actual != str(post_id):
             continue
-        visitados.add(nodo_actual)
+        
+        if nodo_actual != str(post_id):
+            visitados.add(nodo_actual)
+            max_depth = max(max_depth, nivel)
+            
         for hijo in children_map.get(nodo_actual, []):
             if hijo not in visitados:
-                cola.append(hijo)
+                cola.append((hijo, nivel + 1))
 
-    visitados.discard(str(post_id))  # No contamos el post original como parte de su propia propagación
-    return list(visitados)
+    return list(visitados), max_depth
 
 def _calcular_velocidad(post_original: pd.Series, replies_df: pd.DataFrame) -> Dict[str, Any]:
     """Calcula cuánto tiempo tardan en aparecer las respuestas respecto al original."""
@@ -224,3 +234,28 @@ def _formato_tiempo(minutos: float) -> str:
     if minutos < 60: return f"{round(minutos, 1)} min"
     if minutos < 1440: return f"{round(minutos / 60, 1)} horas"
     return f"{round(minutos / 1440, 1)} días"
+
+def _determinar_arquetipo(alcance: int, profundidad: int, directas: int) -> str:
+    """
+    Clasifica la topología de la propagación en arquetipos creativos.
+    """
+    if alcance == 0:
+        return "Germinal (Sin eco)"
+    
+    # 1. Caso Estrella: Muchas respuestas pero nadie habla entre sí
+    if directas > 5 and profundidad <= 2:
+        return "Estrella (Ruido Efímero)"
+    
+    # 2. Caso Hilo: Poca gente pero mucha profundidad
+    if profundidad > 4 and directas < 5:
+        return "Hilo Crítico (Debate Profundo)"
+    
+    # 3. Caso Explosión: Mucho de todo
+    if alcance > 20 and profundidad > 3:
+        return "Explosión Viral (Ecosistema)"
+    
+    # 4. Por defecto
+    if profundidad > 2:
+        return "Ramificado (Conversación Estándar)"
+        
+    return "Reacción Simple"
