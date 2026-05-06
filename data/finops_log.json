@@ -160,10 +160,64 @@
           "cost_usd": 4.515e-05
         }
       ]
+    },
+    "373cf1d5-0a37-48a2-90e6-033f4fe285c4": {
+      "total_cost_usd": 0.0005979,
+      "total_tokens_in": 3334,
+      "total_tokens_out": 163,
+      "calls": [
+        {
+          "timestamp": "2026-05-06T17:23:34.879709+00:00",
+          "service": "agente",
+          "model": "gemini-3.1-flash-lite-preview",
+          "tokens_in": 1357,
+          "tokens_out": 14,
+          "cost_usd": 0.00021195
+        },
+        {
+          "timestamp": "2026-05-06T17:23:53.282183+00:00",
+          "service": "agente",
+          "model": "gemini-3.1-flash-lite-preview",
+          "tokens_in": 1977,
+          "tokens_out": 149,
+          "cost_usd": 0.00038595
+        }
+      ]
+    },
+    "7a0acb84-8960-4109-8aaf-76946170cab2": {
+      "total_cost_usd": 0.00054975,
+      "total_tokens_in": 2909,
+      "total_tokens_out": 189,
+      "calls": [
+        {
+          "timestamp": "2026-05-06T17:26:16.811312+00:00",
+          "service": "agente",
+          "model": "gemini-3.1-flash-lite-preview",
+          "tokens_in": 1364,
+          "tokens_out": 29,
+          "cost_usd": 0.000222
+        },
+        {
+          "timestamp": "2026-05-06T17:26:40.712928+00:00",
+          "service": "sentimiento",
+          "model": "gemini-3.1-flash-lite-preview",
+          "tokens_in": 83,
+          "tokens_out": 67,
+          "cost_usd": 5.265e-05
+        },
+        {
+          "timestamp": "2026-05-06T17:26:50.376607+00:00",
+          "service": "agente",
+          "model": "gemini-3.1-flash-lite-preview",
+          "tokens_in": 1462,
+          "tokens_out": 93,
+          "cost_usd": 0.0002751
+        }
+      ]
     }
   },
   "global": {
-    "total_cost_usd": 0.0008376,
-    "total_calls": 14
+    "total_cost_usd": 0.00198525,
+    "total_calls": 19
   }
 }
