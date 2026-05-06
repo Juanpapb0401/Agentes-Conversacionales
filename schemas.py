@@ -38,6 +38,7 @@ class PropagacionResponse(BaseModel):
     alcance: int
     replies_directas: int
     cadena_total_nodos: int
+    profundidad_maxima: int
     usuarios_unicos_en_cadena: Optional[int] = None
     plataformas: Optional[List[str]] = None
     velocidad_media_min: Optional[float]
@@ -45,3 +46,4 @@ class PropagacionResponse(BaseModel):
     porcentaje_contenido_replicado: float
     score_impacto: float
     nivel_impacto: str
+    arquetipo: str
