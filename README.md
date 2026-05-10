@@ -137,6 +137,7 @@ Swagger UI disponible en: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/doc
 | `POST` | `/analisis/resumen` | Resumen y temas de una conversación |
 | `GET` | `/analisis/propagacion?post_id=X` | Propagación e impacto de un mensaje |
 | `POST` | `/analisis/metricas` | Estadísticas generales de la red |
+| `GET` | `/scraping/tweets?query=X&n=20` | Tweets en tiempo real vía Twitter/X |
 
 ### Terminal 2 — Interfaz Streamlit (Frontend)
 
@@ -148,28 +149,98 @@ Se abre en: [http://localhost:8501](http://localhost:8501)
 
 ---
 
+## Despliegue con Docker
+
+> Alternativa a la instalación manual. Requiere [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado.
+
+### Requisitos previos
+
+1. Tener el dataset en `data/Reto_data_20251023_122206.parquet`
+2. Tener el archivo `.env` configurado en la raíz (igual que en el setup manual)
+3. Para el scraping de Twitter, agregar en `.env`:
+   ```env
+   TWITTER_ACCOUNTS=usuario:contraseña:email@gmail.com
+   ```
+
+### Construir y levantar
+
+```bash
+# Desde la raíz del proyecto
+docker compose -f docker/docker-compose.yml up --build
+```
+
+- API disponible en: [http://localhost:8000/docs](http://localhost:8000/docs)
+- Streamlit disponible en: [http://localhost:8501](http://localhost:8501)
+
+### Comandos útiles
+
+```bash
+# Detener todos los contenedores
+docker compose -f docker/docker-compose.yml down
+
+# Ver logs en tiempo real
+docker compose -f docker/docker-compose.yml logs -f
+
+# Reconstruir sin caché (después de cambiar código)
+docker compose -f docker/docker-compose.yml up --build --force-recreate
+```
+
+### Cómo funciona internamente
+
+```
+[Navegador] ───► :8501 (agentes-app) ─► Streamlit + Agente LangGraph
+                                         │
+                                         │ HTTP interno
+                                         ▼
+                              :8000 (agentes-api) ─► FastAPI
+                                         │
+                                         ▼
+                                   data/ (volumen compartido)
+```
+
+El contenedor `agentes-app` llama a `agentes-api` por su nombre de servicio interno (`http://api:8000`), no por `localhost`. Ambos comparten el volumen `data/` para acceder al dataset y a la base de datos de cuentas de twscrape.
+
+---
+
 ## Estructura del Proyecto
 
 ```
 Agentes-Conversacionales/
 │
-├── app.py                          # Interfaz Streamlit (Rol 4)
-├── main.py                         # Servidor FastAPI — entry point (Rol 1)
+├── app.py                          # Interfaz Streamlit — entry point UI (Rol 4)
+├── main.py                         # Servidor FastAPI — entry point API (Rol 1)
 ├── data_loader.py                  # Carga y normalización del .parquet (Rol 1)
-├── schemas.py                      # Contratos Pydantic (Rol 1)
-├── requirements.txt
+├── schemas.py                      # Contratos Pydantic request/response (Rol 1)
+├── requirements.txt                # Dependencias Python
 ├── .env                            # Variables de entorno (NO subir a git)
+├── .env.example                    # Plantilla de variables de entorno
 │
 ├── agent/                          # Capa de Orquestación — Rol 4
-│   ├── tools.py                    # 4 tools @tool de LangChain
-│   └── graph.py                    # Grafo LangGraph + MemorySaver
+│   ├── tools.py                    # 5 tools @tool de LangChain (+ Twitter scraping)
+│   └── graph.py                    # Grafo LangGraph + MemorySaver + FinOps
 │
-├── routers/
-│   └── propagacion_endpoint.py     # GET /analisis/propagacion (Rol 3)
+├── routers/                        # Endpoints adicionales de FastAPI
+│   ├── propagacion_endpoint.py     # GET /analisis/propagacion (Rol 3)
+│   └── scraping_endpoint.py        # GET /scraping/tweets
 │
-├── services/
+├── services/                       # Lógica de negocio
 │   ├── nlp_service.py              # LLM: sentimientos + resumen (Rol 2)
-│   └── propagacion_service.py      # BFS + velocidad + score (Rol 3)
+│   ├── propagacion_service.py      # BFS + velocidad + score impacto (Rol 3)
+│   └── scraping_service.py         # Twitter/X scraping con twscrape
+│
+├── pages/                          # Páginas adicionales de Streamlit
+│   └── 1_Dashboard.py              # Dashboard visual (charts, scraping, métricas)
+│
+├── docker/                         # Configuración Docker
+│   ├── Dockerfile.api              # Imagen del backend FastAPI
+│   ├── Dockerfile.app              # Imagen del frontend Streamlit
+│   └── docker-compose.yml          # Orquestación completa
+│
+├── docs/                           # Documentación complementaria
+│   ├── ARQUITECTURA.md             # Diagramas y decisiones de diseño
+│   ├── Explicacion.md              # Explicación narrativa del sistema
+│   ├── contexto.md                 # Contexto del reto
+│   └── Reto_ICESI_Agentes_Conversacionales.md
 │
 ├── data/                           # Dataset (NO subir a git)
 │   └── Reto_data_20251023_122206.parquet
@@ -198,6 +269,7 @@ Agentes-Conversacionales/
 | "Resume estos comentarios: ['...', '...']" | `tool_resumir_conversacion` |
 | "¿Qué tan viral fue el post con ID 1001?" | `tool_analizar_propagacion` |
 | "¿Quiénes son los usuarios más influyentes?" | `tool_analizar_metricas` |
+| "Busca 20 tweets recientes sobre #Colombia" | `tool_buscar_tweets` |
 
 ---
 
