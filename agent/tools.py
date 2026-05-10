@@ -20,9 +20,32 @@ _API_BASE_URL = os.environ.get("API_BASE_URL", "http://127.0.0.1:8000").rstrip("
 # Timeout de las llamadas HTTP en segundos
 _HTTP_TIMEOUT = 30.0
 
+# Session ID set by wrap_tool_call before each tool execution
+_active_session_id: str = "unknown"
+
+
+def _tool_call_wrapper(request, execute):
+    """
+    Intercepts every tool call to propagate session_id from LangGraph config
+    into the module-level _active_session_id, bypassing ContextVar threading issues.
+    Reads thread_id / session_id from request.runtime.config.configurable.
+    """
+    global _active_session_id
+    runtime = request.runtime
+    if isinstance(runtime, dict):
+        configurable = runtime.get("configurable") or (runtime.get("config") or {}).get("configurable")
+    else:
+        configurable = getattr(getattr(runtime, "config", None), "configurable", None) or {}
+    session_id = configurable.get("session_id") or configurable.get("thread_id") or "unknown"
+    _active_session_id = session_id
+    try:
+        return execute(request)
+    finally:
+        _active_session_id = "unknown"
+
 
 def _session_headers() -> Dict[str, str]:
-    return {"X-Session-ID": _SESSION_CTX.get()}
+    return {"X-Session-ID": _active_session_id}
 
 
 def _get(endpoint: str, params: Dict[str, Any] | None = None) -> Dict[str, Any]:
@@ -182,7 +205,7 @@ def tool_analizar_metricas() -> Dict[str, Any]:
 
 
 # =============================================================================
-# Lista exportable para el Agente (Ticket 3)
+# Lista exportable para el Agente + wrapper de sesion
 # =============================================================================
 
 TOOLS = [
@@ -191,3 +214,5 @@ TOOLS = [
     tool_analizar_propagacion,
     tool_analizar_metricas,
 ]
+
+wrap_tool_call = _tool_call_wrapper

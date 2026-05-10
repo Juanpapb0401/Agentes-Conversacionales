@@ -70,3 +70,21 @@ BFS builds full descendant tree from `post_id`. Impact score is weighted: reach 
 - **Column normalization** in `data_loader.py` is the single source of truth for dataset field names — update aliases there before changing service queries.
 - **Pydantic schemas** in `schemas.py` define all request/response contracts; keep them in sync with service return dicts.
 - **Tests** mock the FastAPI HTTP layer (`respx`) for tool tests and use a real in-memory graph for graph tests.
+
+## FinOps Session Tracking (fix applied 2026-05-10)
+
+Session tracking for the FinOps cost dashboard had an intermittent bug where the `X-Session-ID` header
+sometimes arrived as `"unknown"` at FastAPI endpoints, causing orphaned or missing log entries.
+
+**Root cause:** `tools.py` read session ID from a `ContextVar` (`SESSION_CTX`) that did not reliably
+propagate across the async thread pool used by LangGraph's `ToolNode`.
+
+**Fix:**
+- `agent/tools.py` — added `_active_session_id` module variable and `_tool_call_wrapper` that
+  intercepts every tool call, reads `session_id` from `request.runtime.config.configurable`, and
+  sets `_active_session_id` before tool execution (resets to `"unknown"` in `finally`).
+- `agent/graph.py` — `ToolNode` is now created with `wrap_tool_call=wrap_tool_call` to activate the interceptor.
+- `app.py:193` — config now passes both `thread_id` and `session_id` in `configurable`.
+
+**Important:** Do not use `SESSION_CTX` (`_SESSION_CTX.get()`) for the tool-call HTTP path —
+all FinOps HTTP headers now route through `_active_session_id` set by the wrapper.

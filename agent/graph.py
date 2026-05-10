@@ -28,7 +28,7 @@ from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.checkpoint.memory import MemorySaver
 
-from agent.tools import TOOLS
+from agent.tools import TOOLS, wrap_tool_call
 from services.finops_service import log_call as _finops_log
 
 load_dotenv()
@@ -140,8 +140,7 @@ def _crear_nodo_modelo(llm_con_tools, model_name: str):
             or usage_openai.get("completion_tokens")
             or 0
         )
-        if tokens_in or tokens_out:
-            _finops_log(thread_id, "agente", model_name, tokens_in, tokens_out)
+        _finops_log(thread_id, "agente", model_name, tokens_in, tokens_out)
 
         return {"messages": [respuesta]}
 
@@ -165,7 +164,7 @@ def construir_grafo():
     llm_con_tools = llm.bind_tools(TOOLS)
 
     # Nodo de ejecución de herramientas (ToolNode maneja errores internamente)
-    nodo_herramientas = ToolNode(tools=TOOLS)
+    nodo_herramientas = ToolNode(tools=TOOLS, wrap_tool_call=wrap_tool_call)
 
     # Crear el nodo llamar_modelo con el LLM inyectado
     nodo_modelo = _crear_nodo_modelo(llm_con_tools, model_name)
