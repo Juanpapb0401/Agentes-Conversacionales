@@ -190,7 +190,7 @@ if pregunta:
     st.session_state.historial_ui.append({"rol": "user", "contenido": pregunta})
 
     # Configuración del grafo (thread_id para memoria multi-turno)
-    config = {"configurable": {"thread_id": st.session_state.thread_id}}
+    config = {"configurable": {"thread_id": st.session_state.thread_id, "session_id": st.session_state.thread_id}}
 
     # FinOps: verificar presupuesto antes de invocar
     stats_now = get_session_total(st.session_state.thread_id)

@@ -5,9 +5,6 @@ markdown_content = """# Documentación del Proyecto: Reto ICESI - Agentes Conver
 * **Institución:** Universidad Icesi
 * **Programa:** Ingeniería de Sistemas / Diseño de Medios Interactivos
 * **Curso:** Reto AI Engineering
-* **Estudiante Líder (Rol 1):** Vanessa Sánchez Morales
-
----
 
 ## 2. Especificaciones Oficiales del Reto
 

@@ -9,6 +9,7 @@ from schemas import (
 )
 from data_loader import dataframe_principal
 from routers.propagacion_endpoint import router as propagacion_router
+from routers.scraping_endpoint import router as scraping_router
 from services.nlp_service import analizar_sentimiento_llm, resumir_conversacion_llm
 
 app = FastAPI(
@@ -27,6 +28,7 @@ app.add_middleware(
 
 # Incluir Routers Modulares
 app.include_router(propagacion_router)
+app.include_router(scraping_router)
 
 # 1. Endpoint de Sentimientos
 @app.post("/analisis/sentimientos", response_model=SentimientoResponse)

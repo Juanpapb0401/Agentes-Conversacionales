@@ -28,7 +28,7 @@ from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.checkpoint.memory import MemorySaver
 
-from agent.tools import TOOLS
+from agent.tools import TOOLS, wrap_tool_call
 from services.finops_service import log_call as _finops_log
 
 load_dotenv()
@@ -75,12 +75,13 @@ def _build_llm():
 # =============================================================================
 
 SYSTEM_PROMPT = SystemMessage(content="""Eres un Agente Conversacional especializado en el análisis de conversaciones digitales.
-Tienes acceso a cuatro herramientas analíticas que debes invocar cuando el usuario lo necesite:
+Tienes acceso a cinco herramientas analíticas que debes invocar cuando el usuario lo necesite:
 
 1. tool_analizar_sentimiento — para determinar el clima emocional (positivo, negativo, neutral) de un texto.
 2. tool_resumir_conversacion — para generar un resumen con temas y posturas clave de una lista de textos.
 3. tool_analizar_propagacion — para medir el alcance, velocidad e impacto de un mensaje identificado por su post_id.
 4. tool_analizar_metricas — para obtener estadísticas generales: total de likes y top influencers de la red.
+5. tool_buscar_tweets — para buscar y extraer tweets en tiempo real de Twitter/X por palabra clave o hashtag.
 
 Instrucciones de comportamiento:
 - Identifica la intención del usuario y selecciona la herramienta más adecuada.
@@ -140,8 +141,7 @@ def _crear_nodo_modelo(llm_con_tools, model_name: str):
             or usage_openai.get("completion_tokens")
             or 0
         )
-        if tokens_in or tokens_out:
-            _finops_log(thread_id, "agente", model_name, tokens_in, tokens_out)
+        _finops_log(thread_id, "agente", model_name, tokens_in, tokens_out)
 
         return {"messages": [respuesta]}
 
@@ -165,7 +165,7 @@ def construir_grafo():
     llm_con_tools = llm.bind_tools(TOOLS)
 
     # Nodo de ejecución de herramientas (ToolNode maneja errores internamente)
-    nodo_herramientas = ToolNode(tools=TOOLS)
+    nodo_herramientas = ToolNode(tools=TOOLS, wrap_tool_call=wrap_tool_call)
 
     # Crear el nodo llamar_modelo con el LLM inyectado
     nodo_modelo = _crear_nodo_modelo(llm_con_tools, model_name)
