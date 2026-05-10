@@ -9,7 +9,6 @@ Funcionalidades:
   4. Seleccionar un tweet para analizar su propagación en el dataset base
 """
 
-import json
 import os
 import time
 
@@ -26,18 +25,18 @@ _HTTP_TIMEOUT = 60.0  # scraping puede tardar más que análisis normal
 
 st.set_page_config(
     page_title="Dashboard — Análisis Twitter/X",
-    page_icon="📊",
+    page_icon=None,
     layout="wide",
 )
 
-st.title("📊 Dashboard de Análisis en Tiempo Real")
+st.title("Dashboard de Análisis en Tiempo Real")
 st.caption("Extrae tweets de Twitter/X, analiza su sentimiento y visualiza el impacto")
 
 # =============================================================================
 # SECCIÓN 1 — Búsqueda y Scraping
 # =============================================================================
 
-st.header("🔍 Búsqueda de Tweets")
+st.header("Búsqueda de Tweets")
 
 col_q, col_n, col_lang, col_btn = st.columns([3, 1, 1, 1])
 with col_q:
@@ -49,7 +48,7 @@ with col_lang:
 with col_btn:
     st.write("")
     st.write("")
-    buscar = st.button("🚀 Scrapear", use_container_width=True, type="primary")
+    buscar = st.button("Scrapear", use_container_width=True, type="primary")
 
 # Persistir tweets entre rerenders
 if "tweets_scrapeados" not in st.session_state:
@@ -90,7 +89,7 @@ tweets = st.session_state.tweets_scrapeados
 
 if tweets:
     st.divider()
-    st.header("🧠 Análisis de Sentimientos")
+    st.header("Análisis de Sentimientos")
 
     analizar_btn = st.button(
         f"Analizar sentimiento de {len(tweets)} tweets",
@@ -238,7 +237,7 @@ if tweets:
         # TABLA DE TWEETS
         # =========================================================
         st.divider()
-        st.subheader("📋 Tweets Analizados")
+        st.subheader("Tweets Analizados")
 
         clima_filtro = st.multiselect(
             "Filtrar por clima",
@@ -248,12 +247,12 @@ if tweets:
         filtrados = [e for e in enriched if e["clima"] in clima_filtro]
 
         for e in filtrados:
-            color = {"positivo": "🟢", "negativo": "🔴", "neutral": "⚪"}.get(e["clima"], "⚪")
+            color = {"positivo": "[+]", "negativo": "[-]", "neutral": "[~]"}.get(e["clima"], "[~]")
             with st.expander(
-                f"{color} **@{e['autor']}** — score {e['score']:.2f} | 👍 {e['likes']} 🔁 {e['retweets']}"
+                f"{color} @{e['autor']} — score {e['score']:.2f} | likes {e['likes']} RT {e['retweets']}"
             ):
                 st.markdown(f"> {e['texto']}")
-                st.caption(f"📅 {e['fecha']} | 🌐 [Ver tweet]({e['url']})")
+                st.caption(f"{e['fecha']} | [Ver tweet]({e['url']})")
                 st.info(f"**Justificación:** {e['justificacion']}")
 
 # =============================================================================
@@ -261,7 +260,7 @@ if tweets:
 # =============================================================================
 
 st.divider()
-st.header("🌐 Análisis de Propagación del Dataset Base")
+st.header("Análisis de Propagación del Dataset Base")
 st.caption("Selecciona o escribe un post_id del dataset original para analizar su viralidad")
 
 post_id_input = st.text_input(
@@ -270,7 +269,7 @@ post_id_input = st.text_input(
     key="prop_post_id",
 )
 
-if st.button("📡 Analizar Propagación", disabled=not post_id_input.strip()):
+if st.button("Analizar Propagación", disabled=not post_id_input.strip()):
     with st.spinner("Calculando propagación..."):
         try:
             resp = httpx.get(
@@ -317,7 +316,7 @@ if st.button("📡 Analizar Propagación", disabled=not post_id_input.strip()):
         fig_imp.update_layout(height=250, margin=dict(t=50, b=10, l=20, r=20))
         st.plotly_chart(fig_imp, use_container_width=True)
 
-        with st.expander("🔍 Ver JSON completo"):
+        with st.expander("Ver JSON completo"):
             st.json(p)
     elif p:
         st.warning(f"Post ID `{post_id_input}` no encontrado en el dataset.")
@@ -327,7 +326,7 @@ if st.button("📡 Analizar Propagación", disabled=not post_id_input.strip()):
 # =============================================================================
 
 st.divider()
-st.header("📈 Métricas Generales del Dataset")
+st.header("Métricas Generales del Dataset")
 
 if st.button("Cargar métricas del dataset"):
     with st.spinner("Calculando métricas..."):
@@ -348,12 +347,12 @@ if m:
 
     col_inf, col_post = st.columns(2)
     with col_inf:
-        st.subheader("🏆 Top 5 Influencers")
+        st.subheader("Top 5 Influencers")
         for i, user in enumerate(m.get("top_influencers", []), 1):
             st.markdown(f"**{i}.** `{user}`")
 
     with col_post:
-        st.subheader("🔥 Top 5 Posts por Likes")
+        st.subheader("Top 5 Posts por Likes")
         for post in m.get("top_posts_por_likes", []):
-            with st.expander(f"👍 {post.get('likes', 0):,} likes — `{post.get('post_id', '')[:30]}...`"):
+            with st.expander(f"{post.get('likes', 0):,} likes — {post.get('post_id', '')[:30]}..."):
                 st.write(post.get("text", "Sin texto"))

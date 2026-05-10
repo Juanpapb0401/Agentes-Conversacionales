@@ -18,6 +18,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py ./
 COPY pages/ pages/
 COPY agent/ agent/
+COPY services/ services/
 
 EXPOSE 8501
 
