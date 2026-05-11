@@ -64,9 +64,29 @@ def _build_llm():
         model_name = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite-preview")
         return ChatGoogleGenerativeAI(model=model_name, google_api_key=api_key, temperature=0)
 
+    if provider == "anthropic":
+        from langchain_anthropic import ChatAnthropic
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "Falta ANTHROPIC_API_KEY en el archivo .env para usar el proveedor 'anthropic'."
+            )
+        model_name = os.environ.get("ANTHROPIC_MODEL", "claude-3-5-haiku-20241022")
+        return ChatAnthropic(model=model_name, api_key=api_key, temperature=0)
+
+    if provider == "groq":
+        from langchain_groq import ChatGroq
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            raise RuntimeError(
+                "Falta GROQ_API_KEY en el archivo .env para usar el proveedor 'groq'."
+            )
+        model_name = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+        return ChatGroq(model=model_name, groq_api_key=api_key, temperature=0)
+
     raise RuntimeError(
         "LLM_PROVIDER no está configurado en el .env. "
-        "Establece LLM_PROVIDER=openai o LLM_PROVIDER=gemini."
+        "Establece LLM_PROVIDER=openai, gemini, anthropic o groq."
     )
 
 

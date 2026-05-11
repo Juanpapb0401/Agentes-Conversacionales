@@ -119,104 +119,242 @@ def _llm_call(
         return _call_openai(system_prompt, user_prompt, max_tokens=max_tokens, session_id=session_id, service=service)
     if provider == "gemini":
         return _call_gemini(system_prompt, user_prompt, max_tokens=max_tokens, session_id=session_id, service=service)
+    if provider == "anthropic":
+        return _call_anthropic(system_prompt, user_prompt, max_tokens=max_tokens, session_id=session_id, service=service)
+    if provider == "groq":
+        return _call_groq(system_prompt, user_prompt, max_tokens=max_tokens, session_id=session_id, service=service)
 
-    raise RuntimeError("LLM_PROVIDER no esta configurado. Use 'openai' o 'gemini'.")
+    raise RuntimeError("LLM_PROVIDER no esta configurado. Use: openai, gemini, anthropic o groq.")
 
 
-def _call_openai(system_prompt: str, user_prompt: str, max_tokens: int = 300, session_id: str = "unknown", service: str = "llm") -> str:
+def _call_openai(
+    system_prompt: str,
+    user_prompt: str,
+    max_tokens: int = 300,
+    session_id: str = "unknown",
+    service: str = "llm",
+    model: Optional[str] = None,
+    json_mode: bool = True,
+) -> str:
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY no esta configurado")
 
+    model = model or DEFAULT_OPENAI_MODEL
     url = "https://api.openai.com/v1/chat/completions"
-    payload = {
-        "model": DEFAULT_OPENAI_MODEL,
+    payload: Dict[str, Any] = {
+        "model": model,
         "messages": [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
+            {"role": "user", "content": user_prompt},
         ],
         "temperature": 0.2,
         "max_tokens": max_tokens,
-        "response_format": {"type": "json_object"}
     }
+    if json_mode:
+        payload["response_format"] = {"type": "json_object"}
 
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}"
-        },
-        method="POST"
+        headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"},
+        method="POST",
     )
-
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             usage = data.get("usage", {})
-            _finops_log(
-                session_id, service, DEFAULT_OPENAI_MODEL,
-                usage.get("prompt_tokens", 0),
-                usage.get("completion_tokens", 0),
-            )
+            _finops_log(session_id, service, model,
+                        usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0))
             return data["choices"][0]["message"]["content"]
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8") if exc.fp else str(exc)
         raise RuntimeError(f"OpenAI HTTP {exc.code}: {detail}") from exc
 
 
-def _call_gemini(system_prompt: str, user_prompt: str, max_tokens: int = 300, session_id: str = "unknown", service: str = "llm") -> str:
+def _call_gemini(
+    system_prompt: str,
+    user_prompt: str,
+    max_tokens: int = 300,
+    session_id: str = "unknown",
+    service: str = "llm",
+    model: Optional[str] = None,
+    json_mode: bool = True,
+) -> str:
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY no esta configurado")
 
-    model = DEFAULT_GEMINI_MODEL
+    model = model or DEFAULT_GEMINI_MODEL
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
 
-    # system_instruction separado del mensaje de usuario (API nativa de Gemini)
-    payload = {
-        "system_instruction": {
-            "parts": [{"text": system_prompt}]
-        },
-        "contents": [
-            {
-                "role": "user",
-                "parts": [{"text": user_prompt}]
-            }
-        ],
-        "generationConfig": {
-            "temperature": 0.2,
-            "maxOutputTokens": max_tokens,
-            "responseMimeType": "application/json",
-            "thinkingConfig": {
-                "thinkingBudget": 0
-            }
-        }
+    gen_config: Dict[str, Any] = {
+        "temperature": 0.2,
+        "maxOutputTokens": max_tokens,
+        "responseMimeType": "application/json" if json_mode else "text/plain",
+    }
+    # thinkingConfig only supported by Gemini 2.5+ models
+    if model and "2.5" in model:
+        gen_config["thinkingConfig"] = {"thinkingBudget": 0}
+
+    payload: Dict[str, Any] = {
+        "system_instruction": {"parts": [{"text": system_prompt}]},
+        "contents": [{"role": "user", "parts": [{"text": user_prompt}]}],
+        "generationConfig": gen_config,
     }
 
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
         headers={"Content-Type": "application/json"},
-        method="POST"
+        method="POST",
     )
-
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             usage = data.get("usageMetadata", {})
-            _finops_log(
-                session_id, service, model,
-                usage.get("promptTokenCount", 0),
-                usage.get("candidatesTokenCount", 0),
-            )
+            _finops_log(session_id, service, model,
+                        usage.get("promptTokenCount", 0), usage.get("candidatesTokenCount", 0))
             candidates = data.get("candidates", [])
             if not candidates:
-                return "{}"
-            return candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "{}")
+                return "{}" if json_mode else ""
+            return candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8") if exc.fp else str(exc)
         raise RuntimeError(f"Gemini HTTP {exc.code}: {detail}") from exc
+
+
+def _call_anthropic(
+    system_prompt: str,
+    user_prompt: str,
+    max_tokens: int = 300,
+    session_id: str = "unknown",
+    service: str = "llm",
+    model: Optional[str] = None,
+    json_mode: bool = True,
+) -> str:
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise RuntimeError("ANTHROPIC_API_KEY no esta configurado")
+
+    model = model or os.environ.get("ANTHROPIC_MODEL", "claude-3-5-haiku-20241022")
+
+    # Cuando json_mode=True, pedimos explícitamente JSON en el system prompt
+    sys_final = system_prompt
+    if json_mode:
+        sys_final = system_prompt + "\nResponde SOLO con JSON valido, sin markdown ni texto adicional."
+
+    payload = {
+        "model": model,
+        "max_tokens": max_tokens,
+        "system": sys_final,
+        "messages": [{"role": "user", "content": user_prompt}],
+    }
+    req = urllib.request.Request(
+        "https://api.anthropic.com/v1/messages",
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Content-Type": "application/json",
+            "x-api-key": api_key,
+            "anthropic-version": "2023-06-01",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            usage = data.get("usage", {})
+            _finops_log(session_id, service, model,
+                        usage.get("input_tokens", 0), usage.get("output_tokens", 0))
+            return data["content"][0]["text"]
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8") if exc.fp else str(exc)
+        raise RuntimeError(f"Anthropic HTTP {exc.code}: {detail}") from exc
+
+
+def _call_groq(
+    system_prompt: str,
+    user_prompt: str,
+    max_tokens: int = 300,
+    session_id: str = "unknown",
+    service: str = "llm",
+    model: Optional[str] = None,
+    json_mode: bool = False,
+) -> str:
+    import httpx
+
+    api_key = os.environ.get("GROQ_API_KEY")
+    if not api_key:
+        raise RuntimeError("GROQ_API_KEY no esta configurado")
+
+    model = model or os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+    payload: Dict[str, Any] = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        "temperature": 0.2,
+        "max_tokens": max_tokens,
+    }
+    if json_mode:
+        payload["response_format"] = {"type": "json_object"}
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+    }
+    try:
+        with httpx.Client(timeout=60) as client:
+            resp = client.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                json=payload,
+                headers=headers,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            usage = data.get("usage", {})
+            _finops_log(session_id, service, model,
+                        usage.get("prompt_tokens", 0), usage.get("completion_tokens", 0))
+            return data["choices"][0]["message"]["content"]
+    except httpx.HTTPStatusError as exc:
+        raise RuntimeError(f"Groq HTTP {exc.response.status_code}: {exc.response.text}") from exc
+
+
+# =============================================================================
+# API pública para comparación directa de modelos
+# =============================================================================
+
+def call_model_direct(
+    system_prompt: str,
+    user_prompt: str,
+    provider: str,
+    model: str,
+    max_tokens: int = 500,
+    session_id: str = "unknown",
+    service: str = "comparacion",
+    json_mode: bool = False,
+) -> str:
+    """
+    Llama a un modelo específico de cualquier proveedor soportado.
+    Diseñado para la página de comparación multi-modelo.
+
+    Proveedores soportados: openai, gemini, anthropic, groq
+    """
+    p = provider.strip().lower()
+    if p == "openai":
+        return _call_openai(system_prompt, user_prompt, max_tokens=max_tokens,
+                            session_id=session_id, service=service, model=model, json_mode=json_mode)
+    if p == "gemini":
+        return _call_gemini(system_prompt, user_prompt, max_tokens=max_tokens,
+                            session_id=session_id, service=service, model=model, json_mode=json_mode)
+    if p == "anthropic":
+        return _call_anthropic(system_prompt, user_prompt, max_tokens=max_tokens,
+                               session_id=session_id, service=service, model=model, json_mode=json_mode)
+    if p == "groq":
+        return _call_groq(system_prompt, user_prompt, max_tokens=max_tokens,
+                          session_id=session_id, service=service, model=model, json_mode=False)
+    raise RuntimeError(f"Proveedor '{provider}' no soportado. Use: openai, gemini, anthropic, groq")
 
 
 def _safe_json_parse(raw: str) -> Optional[Dict[str, Any]]:

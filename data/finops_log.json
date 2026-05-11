@@ -1,9 +1,9 @@
 {
   "sessions": {
     "unknown": {
-      "total_cost_usd": 0.00043035,
-      "total_tokens_in": 789,
-      "total_tokens_out": 520,
+      "total_cost_usd": 0.0004698,
+      "total_tokens_in": 872,
+      "total_tokens_out": 565,
       "calls": [
         {
           "timestamp": "2026-05-11T00:59:24.779848+00:00",
@@ -76,12 +76,138 @@
           "tokens_in": 85,
           "tokens_out": 66,
           "cost_usd": 5.235e-05
+        },
+        {
+          "timestamp": "2026-05-11T04:36:25.504768+00:00",
+          "service": "sentimiento",
+          "model": "gemini-2.5-flash",
+          "tokens_in": 83,
+          "tokens_out": 45,
+          "cost_usd": 3.945e-05
+        }
+      ]
+    },
+    "23af7d3b-9265-4328-8a3a-774087b300d5": {
+      "total_cost_usd": 0.00061455,
+      "total_tokens_in": 3501,
+      "total_tokens_out": 149,
+      "calls": [
+        {
+          "timestamp": "2026-05-11T04:36:23.669619+00:00",
+          "service": "agente",
+          "model": "gemini-2.5-flash",
+          "tokens_in": 1708,
+          "tokens_out": 104,
+          "cost_usd": 0.0003186
+        },
+        {
+          "timestamp": "2026-05-11T04:36:26.430483+00:00",
+          "service": "agente",
+          "model": "gemini-2.5-flash",
+          "tokens_in": 1793,
+          "tokens_out": 45,
+          "cost_usd": 0.00029595
+        }
+      ]
+    },
+    "comparacion": {
+      "total_cost_usd": 0.00078374,
+      "total_tokens_in": 1397,
+      "total_tokens_out": 781,
+      "calls": [
+        {
+          "timestamp": "2026-05-11T05:11:40.218757+00:00",
+          "service": "comparacion",
+          "model": "llama-3.3-70b-versatile",
+          "tokens_in": 137,
+          "tokens_out": 47,
+          "cost_usd": 0.00011796
+        },
+        {
+          "timestamp": "2026-05-11T05:11:41.140126+00:00",
+          "service": "comparacion",
+          "model": "llama-3.1-8b-instant",
+          "tokens_in": 137,
+          "tokens_out": 61,
+          "cost_usd": 1.173e-05
+        },
+        {
+          "timestamp": "2026-05-11T05:12:28.456272+00:00",
+          "service": "comparacion",
+          "model": "llama-3.3-70b-versatile",
+          "tokens_in": 137,
+          "tokens_out": 47,
+          "cost_usd": 0.00011796
+        },
+        {
+          "timestamp": "2026-05-11T05:12:29.371337+00:00",
+          "service": "comparacion",
+          "model": "llama-3.1-8b-instant",
+          "tokens_in": 137,
+          "tokens_out": 58,
+          "cost_usd": 1.149e-05
+        },
+        {
+          "timestamp": "2026-05-11T05:12:31.068857+00:00",
+          "service": "comparacion",
+          "model": "gemini-2.5-flash",
+          "tokens_in": 92,
+          "tokens_out": 73,
+          "cost_usd": 5.76e-05
+        },
+        {
+          "timestamp": "2026-05-11T05:13:00.502205+00:00",
+          "service": "comparacion",
+          "model": "llama-3.3-70b-versatile",
+          "tokens_in": 137,
+          "tokens_out": 57,
+          "cost_usd": 0.00012586
+        },
+        {
+          "timestamp": "2026-05-11T05:13:00.946494+00:00",
+          "service": "comparacion",
+          "model": "llama-3.1-8b-instant",
+          "tokens_in": 137,
+          "tokens_out": 62,
+          "cost_usd": 1.181e-05
+        },
+        {
+          "timestamp": "2026-05-11T05:13:02.242047+00:00",
+          "service": "comparacion",
+          "model": "gemini-2.5-flash",
+          "tokens_in": 92,
+          "tokens_out": 67,
+          "cost_usd": 5.4e-05
+        },
+        {
+          "timestamp": "2026-05-11T05:17:15.277276+00:00",
+          "service": "comparacion",
+          "model": "llama-3.3-70b-versatile",
+          "tokens_in": 144,
+          "tokens_out": 104,
+          "cost_usd": 0.00016712
+        },
+        {
+          "timestamp": "2026-05-11T05:17:15.752719+00:00",
+          "service": "comparacion",
+          "model": "llama-3.1-8b-instant",
+          "tokens_in": 144,
+          "tokens_out": 72,
+          "cost_usd": 1.296e-05
+        },
+        {
+          "timestamp": "2026-05-11T05:17:17.351025+00:00",
+          "service": "comparacion",
+          "model": "gemini-2.5-flash",
+          "tokens_in": 103,
+          "tokens_out": 133,
+          "cost_usd": 9.525e-05
         }
       ]
     }
   },
   "global": {
-    "total_cost_usd": 0.00043035,
-    "total_calls": 9
+    "total_cost_usd": 0.00186809,
+    "total_calls": 23
   }
 }
