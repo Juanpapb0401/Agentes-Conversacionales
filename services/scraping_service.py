@@ -9,10 +9,19 @@ Gestión de cuentas:
   opcionalmente con email:    "usuario1:pass1:email1@x.com,..."
 
 El pool de cuentas se guarda en data/twscrape_pool.db (SQLite).
+
+Proxy (opcional):
+  Si la IP está bloqueada por Cloudflare, configura en .env:
+  TWSCRAPE_PROXY=http://user:pass@host:port
+
+Modo demo (para presentaciones sin acceso a Twitter):
+  SCRAPING_DEMO_MODE=true  → devuelve tweets ficticios realistas
 """
 
 import asyncio
+import datetime
 import os
+import random
 import re
 from typing import Any, Dict, List, Optional
 
@@ -27,8 +36,9 @@ _MAX_TWEETS = 200
 
 
 def _get_api() -> API:
-    """Devuelve la instancia de API con la base de datos del pool."""
-    return API(_DB_PATH)
+    """Devuelve la instancia de API con proxy opcional."""
+    proxy = os.getenv("TWSCRAPE_PROXY", "").strip() or None
+    return API(_DB_PATH, proxy=proxy)
 
 
 async def _ensure_accounts(api: API) -> None:
@@ -134,6 +144,64 @@ async def _buscar_tweets_async(
     return tweets
 
 
+# =============================================================================
+# MODO DEMO — datos ficticios realistas cuando Twitter bloquea el scraping
+# Activar con: SCRAPING_DEMO_MODE=true en .env
+# =============================================================================
+
+_DEMO_USERS = [
+    ("periodista_col", "María Fernanda López"),
+    ("analista_pol",   "Carlos Andrés Ruiz"),
+    ("ciudadano_bog",  "Juan Pablo García"),
+    ("politico_hoy",   "Diana Milena Torres"),
+    ("noticias_col",   "El Tiempo Digital"),
+    ("voz_popular",    "Andrés Felipe Mora"),
+    ("debate_co",      "Debate Colombia"),
+    ("red_ciudadana",  "Red Ciudadana"),
+]
+
+_DEMO_TEMPLATES = [
+    "Interesante debate sobre {q} hoy en el Congreso. ¿Cuál es tu opinión?",
+    "El tema de {q} sigue generando controversia entre analistas y ciudadanos.",
+    "Nueva propuesta relacionada con {q} fue presentada este martes. Los detalles...",
+    "Expertos advierten sobre el impacto de {q} en la economía nacional.",
+    "Comunidades afectadas por {q} exigen respuestas del gobierno.",
+    "¿Por qué {q} es el tema del momento en Colombia? Un análisis.",
+    "Cifras recientes sobre {q} muestran tendencias preocupantes según informe.",
+    "El debate sobre {q} divide a la opinión pública. ¿Estás a favor o en contra?",
+    "Organizaciones sociales se pronuncian sobre {q} con una declaración pública.",
+    "Gobierno responde a críticas sobre {q}: 'Estamos trabajando en soluciones'.",
+]
+
+
+def _demo_tweets(query: str, n: int) -> List[Dict[str, Any]]:
+    """Genera tweets ficticios realistas para modo demo."""
+    random.seed(hash(query) % 9999)
+    tweets = []
+    now = datetime.datetime.now(datetime.timezone.utc)
+    for i in range(min(n, len(_DEMO_TEMPLATES))):
+        user, name = _DEMO_USERS[i % len(_DEMO_USERS)]
+        texto = _DEMO_TEMPLATES[i].format(q=query)
+        ts = now - datetime.timedelta(minutes=random.randint(5, 1440))
+        tweet_id = str(1800000000000000000 + i * 1000 + random.randint(0, 999))
+        tweets.append({
+            "id":       tweet_id,
+            "url":      f"https://x.com/{user}/status/{tweet_id}",
+            "texto":    texto,
+            "autor":    user,
+            "nombre":   name,
+            "fecha":    ts.isoformat(),
+            "likes":    random.randint(10, 2000),
+            "retweets": random.randint(5, 800),
+            "replies":  random.randint(2, 300),
+            "views":    random.randint(500, 50000),
+            "idioma":   "es",
+            "es_reply": False,
+        })
+    tweets.sort(key=lambda t: t["likes"] * 2 + t["retweets"] * 3, reverse=True)
+    return tweets
+
+
 def buscar_tweets(
     query: str,
     n: int = 20,
@@ -143,6 +211,10 @@ def buscar_tweets(
     """
     Punto de entrada síncrono del servicio.
     Busca los N tweets más relevantes para la palabra clave dada.
+
+    Si SCRAPING_DEMO_MODE=true en .env, retorna datos ficticios realistas
+    (útil cuando Twitter bloquea la IP con Cloudflare).
+    Si TWSCRAPE_PROXY=http://user:pass@host:port está configurado, lo usa.
 
     Args:
         query:           Término de búsqueda (ej: "PETRO", "#Colombia economía")
@@ -156,25 +228,39 @@ def buscar_tweets(
           - n_encontrados: cantidad real de tweets
           - tweets:  lista de dicts con los campos del tweet
           - error:   mensaje de error si algo falló (o None)
+          - demo:    True si los datos son ficticios
     """
     if not query or not query.strip():
         return {"query": query, "n_encontrados": 0, "tweets": [], "error": "Query vacía"}
 
     n = max(1, min(n, _MAX_TWEETS))
 
+    # Modo demo — activo cuando Twitter bloquea la IP
+    if os.getenv("SCRAPING_DEMO_MODE", "").lower() in ("1", "true", "yes"):
+        tweets = _demo_tweets(query, n)
+        return {
+            "query":         query,
+            "n_encontrados": len(tweets),
+            "tweets":        tweets,
+            "error":         None,
+            "demo":          True,
+        }
+
     try:
         # asyncio.run crea un nuevo event loop — compatible con FastAPI sync endpoints
         tweets = asyncio.run(_buscar_tweets_async(query, n, lang, excluir_replies))
         return {
-            "query":        query,
+            "query":         query,
             "n_encontrados": len(tweets),
-            "tweets":       tweets,
-            "error":        None,
+            "tweets":        tweets,
+            "error":         None,
+            "demo":          False,
         }
     except Exception as exc:
         return {
-            "query":        query,
+            "query":         query,
             "n_encontrados": 0,
-            "tweets":       [],
-            "error":        f"Error al scrapear: {str(exc)}",
+            "tweets":        [],
+            "error":         f"Error al scrapear: {str(exc)}",
+            "demo":          False,
         }

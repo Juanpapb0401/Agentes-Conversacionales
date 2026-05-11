@@ -70,7 +70,14 @@ if buscar and query.strip():
             data = resp.json()
             st.session_state.tweets_scrapeados = data.get("tweets", [])
             st.session_state.analisis_sentimientos = {}  # resetear análisis anterior
-            st.success(f"✅ {data['n_encontrados']} tweets extraídos para **'{query}'**")
+            if data.get("demo"):
+                st.warning(
+                    f"{data['n_encontrados']} tweets cargados en **modo demo** "
+                    "(datos ficticios — Twitter bloqueó la IP). "
+                    "Configura `SCRAPING_DEMO_MODE=true` en `.env` para activarlo explícitamente."
+                )
+            else:
+                st.success(f"{data['n_encontrados']} tweets extraídos para **'{query}'**")
         except httpx.HTTPStatusError as e:
             try:
                 detail = e.response.json().get("detail", str(e))
@@ -78,11 +85,11 @@ if buscar and query.strip():
                 detail = e.response.text or str(e)
             st.error(f"Error del servidor ({e.response.status_code}): {detail}")
             st.info(
-                "Si el error menciona cuentas o autenticación, configura "
-                "`TWITTER_ACCOUNTS=user:pass:email` en tu archivo `.env` y reinicia."
+                "Si Twitter bloquea la IP, activa el modo demo: "
+                "agrega `SCRAPING_DEMO_MODE=true` en `.env` y reinicia."
             )
         except Exception as e:
-            st.error(f"❌ No se pudo conectar con la API: {e}")
+            st.error(f"No se pudo conectar con la API: {e}")
             st.info("Verifica que FastAPI esté corriendo en `http://127.0.0.1:8000`")
 
 tweets = st.session_state.tweets_scrapeados
