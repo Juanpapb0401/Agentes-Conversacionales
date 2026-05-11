@@ -133,7 +133,7 @@ with st.sidebar:
 
 for turno in st.session_state.historial_ui:
     rol = turno["rol"]
-    contenido = turno["contenido"]
+    contenido = turno.get("contenido", "")
 
     if rol == "user":
         with st.chat_message("user"):
