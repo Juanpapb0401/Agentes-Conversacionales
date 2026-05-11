@@ -16,7 +16,6 @@ import os
 import re
 from typing import Any, Dict, List, Optional
 
-import twscrape
 from twscrape import API, gather
 from twscrape.models import Tweet
 
@@ -171,16 +170,6 @@ def buscar_tweets(
             "n_encontrados": len(tweets),
             "tweets":       tweets,
             "error":        None,
-        }
-    except twscrape.AccountsPoolEmpty:
-        return {
-            "query":        query,
-            "n_encontrados": 0,
-            "tweets":       [],
-            "error":        (
-                "No hay cuentas de Twitter disponibles. "
-                "Configura TWITTER_ACCOUNTS en el archivo .env."
-            ),
         }
     except Exception as exc:
         return {
