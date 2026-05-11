@@ -34,7 +34,7 @@ def _get_api() -> API:
 
 async def _ensure_accounts(api: API) -> None:
     """
-    Registra cuentas en el pool si aún no están.
+    Registra cuentas en el pool si aún no están y hace login de las pendientes.
     Lee la variable de entorno TWITTER_ACCOUNTS con formato:
         "user1:pass1:email1@x.com,user2:pass2:email2@x.com"
     """
@@ -42,11 +42,17 @@ async def _ensure_accounts(api: API) -> None:
     if not raw:
         return
 
+    # Obtener usernames ya registrados para no agregar duplicados
+    existing = {acc.username.lower() for acc in await api.pool.get_all()}
+
+    new_added = False
     for entry in raw.split(","):
         parts = [p.strip() for p in entry.split(":")]
         if len(parts) < 2:
             continue
         username = parts[0]
+        if username.lower() in existing:
+            continue  # ya está en el pool, no agregar de nuevo
         password = parts[1]
         email    = parts[2] if len(parts) > 2 else f"{username}@example.com"
         await api.pool.add_account(
@@ -55,8 +61,13 @@ async def _ensure_accounts(api: API) -> None:
             email=email,
             email_password=password,
         )
+        new_added = True
 
-    await api.pool.login_all()
+    # Solo hacer login si se agregaron cuentas nuevas o hay pendientes sin login
+    all_accounts = await api.pool.get_all()
+    needs_login = any(not acc.active for acc in all_accounts)
+    if new_added or needs_login:
+        await api.pool.login_all()
 
 
 def _tweet_to_dict(tweet: Tweet) -> Dict[str, Any]:
@@ -86,6 +97,21 @@ async def _buscar_tweets_async(
     """Lógica asíncrona de búsqueda. Llamada desde el wrapper síncrono."""
     api = _get_api()
     await _ensure_accounts(api)
+
+    # Verificar que haya al menos una cuenta activa antes de buscar
+    # (twscrape 0.17+ ya no lanza excepción, simplemente retorna vacío)
+    active_accounts = [acc for acc in await api.pool.get_all() if acc.active]
+    if not active_accounts:
+        all_accounts = await api.pool.get_all()
+        if not all_accounts:
+            raise RuntimeError(
+                "No hay cuentas configuradas. "
+                "Agrega TWITTER_ACCOUNTS=usuario:contraseña:email en .env"
+            )
+        raise RuntimeError(
+            f"Las {len(all_accounts)} cuenta(s) configurada(s) no pudieron autenticarse en Twitter. "
+            "Verifica usuario/contraseña o si Twitter requiere verificación adicional."
+        )
 
     # Construir query con filtros de calidad de Twitter
     q = query.strip()

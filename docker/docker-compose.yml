@@ -26,9 +26,8 @@ services:
     env_file:
       - ../.env
     volumes:
-      # El dataset .parquet y la base de datos de twscrape persisten
-      - ../data:/app/data:ro
-      - twscrape_db:/app/data
+      # data/ montado como escritura: parquet (lectura) + twscrape_pool.db (escritura)
+      - ../data:/app/data
     healthcheck:
       test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/docs')"]
       interval: 30s
@@ -57,6 +56,4 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-volumes:
-  twscrape_db:
-    driver: local
+volumes: {}
