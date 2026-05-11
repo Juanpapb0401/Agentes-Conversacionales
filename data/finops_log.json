@@ -1,87 +1,932 @@
 {
   "sessions": {
-    "unknown": {
-      "total_cost_usd": 0.00043035,
-      "total_tokens_in": 789,
-      "total_tokens_out": 520,
+    "845f6dac-98b9-49fa-b6a2-42994f1d886f": {
+      "total_cost_usd": 0.0002295,
+      "total_tokens_in": 462,
+      "total_tokens_out": 267,
       "calls": [
         {
-          "timestamp": "2026-05-11T00:59:24.779848+00:00",
+          "timestamp": "2026-05-06T12:43:01.028394+00:00",
           "service": "sentimiento",
-          "model": "gemini-3.1-flash-lite-preview",
-          "tokens_in": 90,
+          "model": "gemini-2.5-flash",
+          "tokens_in": 312,
+          "tokens_out": 187,
+          "cost_usd": 0.000159
+        },
+        {
+          "timestamp": "2026-05-06T12:43:01.028893+00:00",
+          "service": "agente",
+          "model": "gemini-2.5-flash",
+          "tokens_in": 150,
+          "tokens_out": 80,
+          "cost_usd": 7.05e-05
+        }
+      ]
+    },
+    "20540920-6d70-4f73-985c-1ec7f960fa29": {
+      "total_cost_usd": 6.555e-05,
+      "total_tokens_in": 205,
+      "total_tokens_out": 58,
+      "calls": [
+        {
+          "timestamp": "2026-05-06T15:38:23.569059+00:00",
+          "service": "sentimiento",
+          "model": "gemini-2.5-flash",
+          "tokens_in": 82,
           "tokens_out": 57,
+          "cost_usd": 4.65e-05
+        },
+        {
+          "timestamp": "2026-05-06T15:39:07.499593+00:00",
+          "service": "resumen",
+          "model": "gemini-2.5-flash",
+          "tokens_in": 123,
+          "tokens_out": 1,
+          "cost_usd": 1.905e-05
+        }
+      ]
+    },
+    "bda9a7bb-3bd9-4420-b5d5-4c4f8876f2a7": {
+      "total_cost_usd": 0.0001383,
+      "total_tokens_in": 246,
+      "total_tokens_out": 169,
+      "calls": [
+        {
+          "timestamp": "2026-05-06T16:02:44.321805+00:00",
+          "service": "sentimiento",
+          "model": "gemini-2.5-flash-lite",
+          "tokens_in": 82,
+          "tokens_out": 58,
+          "cost_usd": 4.71e-05
+        },
+        {
+          "timestamp": "2026-05-06T16:04:07.312074+00:00",
+          "service": "sentimiento",
+          "model": "gemini-2.5-flash-lite",
+          "tokens_in": 82,
+          "tokens_out": 59,
           "cost_usd": 4.77e-05
         },
         {
-          "timestamp": "2026-05-11T00:59:35.989671+00:00",
+          "timestamp": "2026-05-06T16:05:37.821635+00:00",
           "service": "sentimiento",
-          "model": "gemini-3.1-flash-lite-preview",
-          "tokens_in": 87,
-          "tokens_out": 57,
-          "cost_usd": 4.725e-05
-        },
+          "model": "gemini-2.5-flash-lite",
+          "tokens_in": 82,
+          "tokens_out": 52,
+          "cost_usd": 4.35e-05
+        }
+      ]
+    },
+    "d1555592-2803-41ae-8148-5b024ec784c8": {
+      "total_cost_usd": 4.845e-05,
+      "total_tokens_in": 83,
+      "total_tokens_out": 60,
+      "calls": [
         {
-          "timestamp": "2026-05-11T00:59:46.297514+00:00",
+          "timestamp": "2026-05-06T16:16:03.178377+00:00",
           "service": "sentimiento",
-          "model": "gemini-3.1-flash-lite-preview",
-          "tokens_in": 87,
-          "tokens_out": 54,
-          "cost_usd": 4.545e-05
-        },
+          "model": "gemini-2.5-flash-lite",
+          "tokens_in": 83,
+          "tokens_out": 60,
+          "cost_usd": 4.845e-05
+        }
+      ]
+    },
+    "96b4370b-86c4-434b-8e5a-4c5fb3345719": {
+      "total_cost_usd": 4.965e-05,
+      "total_tokens_in": 83,
+      "total_tokens_out": 62,
+      "calls": [
         {
-          "timestamp": "2026-05-11T00:59:55.404710+00:00",
+          "timestamp": "2026-05-06T16:25:38.121812+00:00",
           "service": "sentimiento",
           "model": "gemini-3.1-flash-lite-preview",
-          "tokens_in": 87,
-          "tokens_out": 54,
-          "cost_usd": 4.545e-05
-        },
+          "tokens_in": 83,
+          "tokens_out": 62,
+          "cost_usd": 4.965e-05
+        }
+      ]
+    },
+    "b39cb86d-b47e-464d-a8bb-158a3c08cbee": {
+      "total_cost_usd": 5.265e-05,
+      "total_tokens_in": 83,
+      "total_tokens_out": 67,
+      "calls": [
         {
-          "timestamp": "2026-05-11T01:00:19.489487+00:00",
+          "timestamp": "2026-05-06T16:28:30.358145+00:00",
           "service": "sentimiento",
           "model": "gemini-3.1-flash-lite-preview",
-          "tokens_in": 87,
-          "tokens_out": 61,
+          "tokens_in": 83,
+          "tokens_out": 67,
+          "cost_usd": 5.265e-05
+        }
+      ]
+    },
+    "unknown": {
+      "total_cost_usd": 0.0002535,
+      "total_tokens_in": 370,
+      "total_tokens_out": 330,
+      "calls": [
+        {
+          "timestamp": "2026-05-06T16:31:00.265559+00:00",
+          "service": "sentimiento",
+          "model": "gemini-3.1-flash-lite-preview",
+          "tokens_in": 83,
+          "tokens_out": 62,
           "cost_usd": 4.965e-05
         },
         {
-          "timestamp": "2026-05-11T01:00:28.940431+00:00",
-          "service": "sentimiento",
+          "timestamp": "2026-05-06T16:37:29.668803+00:00",
+          "service": "resumen",
           "model": "gemini-3.1-flash-lite-preview",
-          "tokens_in": 86,
-          "tokens_out": 58,
-          "cost_usd": 4.77e-05
+          "tokens_in": 123,
+          "tokens_out": 146,
+          "cost_usd": 0.00010605
         },
         {
-          "timestamp": "2026-05-11T01:00:42.246725+00:00",
+          "timestamp": "2026-05-06T17:14:05.168694+00:00",
           "service": "sentimiento",
           "model": "gemini-3.1-flash-lite-preview",
-          "tokens_in": 92,
-          "tokens_out": 54,
-          "cost_usd": 4.62e-05
+          "tokens_in": 83,
+          "tokens_out": 67,
+          "cost_usd": 5.265e-05
         },
         {
-          "timestamp": "2026-05-11T01:00:58.802630+00:00",
+          "timestamp": "2026-05-06T17:18:39.404248+00:00",
           "service": "sentimiento",
           "model": "gemini-3.1-flash-lite-preview",
-          "tokens_in": 88,
-          "tokens_out": 59,
-          "cost_usd": 4.86e-05
+          "tokens_in": 81,
+          "tokens_out": 55,
+          "cost_usd": 4.515e-05
+        }
+      ]
+    },
+    "373cf1d5-0a37-48a2-90e6-033f4fe285c4": {
+      "total_cost_usd": 0.0005979,
+      "total_tokens_in": 3334,
+      "total_tokens_out": 163,
+      "calls": [
+        {
+          "timestamp": "2026-05-06T17:23:34.879709+00:00",
+          "service": "agente",
+          "model": "gemini-3.1-flash-lite-preview",
+          "tokens_in": 1357,
+          "tokens_out": 14,
+          "cost_usd": 0.00021195
         },
         {
-          "timestamp": "2026-05-11T01:01:06.941651+00:00",
+          "timestamp": "2026-05-06T17:23:53.282183+00:00",
+          "service": "agente",
+          "model": "gemini-3.1-flash-lite-preview",
+          "tokens_in": 1977,
+          "tokens_out": 149,
+          "cost_usd": 0.00038595
+        }
+      ]
+    },
+    "7a0acb84-8960-4109-8aaf-76946170cab2": {
+      "total_cost_usd": 0.00127155,
+      "total_tokens_in": 6441,
+      "total_tokens_out": 509,
+      "calls": [
+        {
+          "timestamp": "2026-05-06T17:26:16.811312+00:00",
+          "service": "agente",
+          "model": "gemini-3.1-flash-lite-preview",
+          "tokens_in": 1364,
+          "tokens_out": 29,
+          "cost_usd": 0.000222
+        },
+        {
+          "timestamp": "2026-05-06T17:26:40.712928+00:00",
           "service": "sentimiento",
           "model": "gemini-3.1-flash-lite-preview",
-          "tokens_in": 85,
-          "tokens_out": 66,
-          "cost_usd": 5.235e-05
+          "tokens_in": 83,
+          "tokens_out": 67,
+          "cost_usd": 5.265e-05
+        },
+        {
+          "timestamp": "2026-05-06T17:26:50.376607+00:00",
+          "service": "agente",
+          "model": "gemini-3.1-flash-lite-preview",
+          "tokens_in": 1462,
+          "tokens_out": 93,
+          "cost_usd": 0.0002751
+        },
+        {
+          "timestamp": "2026-05-06T17:29:22.826654+00:00",
+          "service": "agente",
+          "model": "gemini-3.1-flash-lite-preview",
+          "tokens_in": 1597,
+          "tokens_out": 50,
+          "cost_usd": 0.00026955
+        },
+        {
+          "timestamp": "2026-05-06T17:29:49.190534+00:00",
+          "service": "agente",
+          "model": "gemini-3.1-flash-lite-preview",
+          "tokens_in": 1935,
+          "tokens_out": 270,
+          "cost_usd": 0.00045225
+        }
+      ]
+    },
+    "30cd04a6-56be-4d71-9a78-402f32658d1a": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:22.013673+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "8280148b-f36f-4426-b1bb-f5e51408e77e": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:22.120647+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "eb274a9b-9f29-4fc0-b5ce-a273f9a3c262": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:22.188740+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "324c8ede-431c-477b-8e9c-4844ad9ad53d": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:22.256720+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "5b38d7f4-0015-467e-bca7-7f910e7142dc": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:22.262417+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:16:22.263469+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "cea96cfd-6e53-46ce-9dec-320df16f9182": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:22.269012+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "999219de-272e-4c88-a755-04ba0cbcbc51": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:22.274506+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:16:22.275438+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:16:22.276366+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "e9000ec4-7334-4d4a-bce2-5e4d71bcea57": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:39.102485+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "32ddafa1-c0bf-4c75-9d61-7f23ecdeab6f": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:39.207408+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "bb46ac11-c25e-48fd-92f2-fbe2c2bf0979": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:39.279224+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "0032d0a9-d76a-4ce8-a1a6-7bab6add1dc6": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:39.351203+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "1c3c78ca-6b08-4aae-83a8-a95236493572": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:39.357010+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:16:39.358087+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "3d34233f-5713-4aa4-aad9-477d5d288adb": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:39.364664+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "fbc86e67-d22c-49b1-9c09-a735876357c8": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:16:39.371638+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:16:39.372837+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:16:39.373975+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "ba80f1de-978a-42ce-905d-34eb6ab1c3b7": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:04.498008+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "c2e59fc8-7c59-43de-9713-b1239eece1df": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:04.601687+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "c2bd5be8-5fb2-4463-b985-f84c396e03ad": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:04.670789+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "721e9139-626d-4f7a-8b52-68572d9e7470": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:04.741068+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "0db79a7f-aaa0-4444-8cfe-40d9619d454e": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:04.747204+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:17:04.748477+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "1d2fb339-6ea0-4d7b-ac88-ccf3fc44c848": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:04.754412+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "2d686074-b453-4749-9c91-4f2b8b6a6762": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:04.760183+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:17:04.761286+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:17:04.762326+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "d62311bd-e243-4565-b571-a04438898734": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:23.434232+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:17:23.435632+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "b787c858-8639-44d2-bb63-42932e87f72f": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:23.441409+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:17:23.442591+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "3777bec0-cd46-44d7-bd9f-58dab3444d5c": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:23.448167+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:17:23.449343+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "63f18139-1fd9-438c-b52e-b2dae959056a": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:23.455158+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "32e52988-d1ac-4071-92a0-0e7c6b56b36c": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:23.460739+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:17:23.461972+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "cecef6b3-1d04-47e2-b795-9f9b6956af07": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:23.467480+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "cf8765cc-8c3f-4267-8e63-ca1756a4e351": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:17:23.472776+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:17:23.473890+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:17:23.475093+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "905cf9ba-59ed-4809-a77a-74e77abf9787": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:38:21.818657+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:38:21.820524+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "91a7bd2b-01f4-45e9-8f59-5e4157820536": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:38:21.828390+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:38:21.829814+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "a3eeb11e-81da-49a5-84bf-e61824c81d25": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:38:21.836314+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:38:21.837657+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "644fd1a4-35e1-4d54-aac5-e3d06aa11b41": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:38:21.843816+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "485f408e-24dd-4991-9a68-91e108c53daa": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:38:21.850121+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:38:21.851484+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "b5b933ec-0bbd-49bc-a240-e03461b1ec1d": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:38:21.858087+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        }
+      ]
+    },
+    "f3221bcc-3ed9-49de-a704-ff184bd5e17f": {
+      "total_cost_usd": 0.0,
+      "total_tokens_in": 0,
+      "total_tokens_out": 0,
+      "calls": [
+        {
+          "timestamp": "2026-05-10T22:38:21.864224+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:38:21.865524+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
+        },
+        {
+          "timestamp": "2026-05-10T22:38:21.866722+00:00",
+          "service": "agente",
+          "model": "gpt-4o-mini",
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "cost_usd": 0.0
         }
       ]
     }
   },
   "global": {
-    "total_cost_usd": 0.00043035,
-    "total_calls": 9
+    "total_cost_usd": 0.00198525,
+    "total_calls": 75
   }
 }
