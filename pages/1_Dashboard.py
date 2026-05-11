@@ -29,7 +29,8 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title("Dashboard de Análisis en Tiempo Real")
+st.title("" \
+"")
 st.caption("Extrae tweets de Twitter/X, analiza su sentimiento y visualiza el impacto")
 
 # =============================================================================
@@ -71,11 +72,14 @@ if buscar and query.strip():
             st.session_state.analisis_sentimientos = {}  # resetear análisis anterior
             st.success(f"✅ {data['n_encontrados']} tweets extraídos para **'{query}'**")
         except httpx.HTTPStatusError as e:
-            detail = e.response.json().get("detail", str(e))
-            st.error(f"❌ Error del servidor: {detail}")
+            try:
+                detail = e.response.json().get("detail", str(e))
+            except Exception:
+                detail = e.response.text or str(e)
+            st.error(f"Error del servidor ({e.response.status_code}): {detail}")
             st.info(
-                "Si ves 'No hay cuentas de Twitter disponibles', configura "
-                "`TWITTER_ACCOUNTS=user:pass:email` en tu archivo `.env`"
+                "Si el error menciona cuentas o autenticación, configura "
+                "`TWITTER_ACCOUNTS=user:pass:email` en tu archivo `.env` y reinicia."
             )
         except Exception as e:
             st.error(f"❌ No se pudo conectar con la API: {e}")
